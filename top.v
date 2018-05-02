@@ -18,7 +18,7 @@ module top (
     assign leds = 8'b 0100_0010;
     
     wire [7:0] character;
-    assign character = 0;
+    assign character = 8'h 33;
 
     // Output signals from VGA sync
     wire px_clk;
@@ -53,7 +53,7 @@ module top (
     `define VGA 22:0    // 23 bits
     `define RGB 25:23   //  3 bits
 
-    `define Zoom 1
+    `define Zoom 0
 
     // wire [`25:0] VGAstr0, VGAstr1;
 
@@ -72,15 +72,15 @@ module top (
         .px_clk(px_clk),      // Pixel clock.
         .pos_x(px_x0 >> `Zoom),       // X screen position.
         .pos_y(px_y0 >> `Zoom),       // Y screen position.
-        .character( character ),   // Character to stream.
+        .character( (px_x0 >> `Zoom) >> 3 ),   // Character to stream.
         .data(pixel_on1)     // Output RGB stream.
     );
 
 // && px_x0[9:3]==7'd 4
 
     assign rgb1 = ( activevideo1 
-                    && px_y1[9:3] >> `Zoom == 7'd 1
-                    && px_x1[9:3] >> `Zoom == 7'd 1
+                    && px_y1[9:3] >> `Zoom < 7'd 16
+                    //&& px_x1[9:3] >> `Zoom < 7'd 16
                 ) ? { pixel_on1, pixel_on1, pixel_on1 } : 3'b000;
 
 endmodule

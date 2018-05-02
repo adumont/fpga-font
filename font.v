@@ -11,19 +11,20 @@ module font (
     parameter FILE_FONT = "font.list";
 
     // Width and height image of font.
-    localparam w = 8;      // Font rom width
-    localparam h = 128*8;  // Font rom height
+    // 16x16 characters, 8x8 bit each
+    localparam w = 128;  // Font rom width
+    localparam h = 128;  // Font rom height
 
     initial
     begin
         $readmemb(FILE_FONT, rom);
     end
 
-    wire [10:0] row;
-    wire [2:0] bit;
+    wire [6:0] row;
+    wire [6:0] bit;
 
-    assign row = { character , pos_y[2:0] };
-    assign bit = pos_x[2:0];
+    assign row =  { character[7:4] , pos_y[2:0] }; // which row in the FONT rom?
+    assign bit = ~{ character[3:0] , pos_x[2:0] }; // which column in the row? (we reverse with ~ because of how the rom FONT is loaded )
 
     // Read Rom Logic
     reg [w-1:0] rom [0:h-1];

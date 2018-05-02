@@ -1,0 +1,31 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Wed May  2 23:06:50 2018
+[*]
+[dumpfile] "/home/adumont/projects/Font/font_tb.vcd"
+[dumpfile_mtime] "Wed May  2 23:02:32 2018"
+[dumpfile_size] 3374
+[savefile] "/home/adumont/projects/Font/font_tb.gtkw"
+[timestart] 0
+[size] 1680 1003
+[pos] -664 -399
+*-3.284962 17 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] font_tb.
+[treeopen] font_tb.fontRom01.
+[sst_width] 197
+[signals_width] 170
+[sst_expanded] 1
+[sst_vpaned_height] 299
+@24
+font_tb.fontRom01.px_clk
+@25
+font_tb.fontRom01.character[7:0]
+@24
+font_tb.fontRom01.pos_y[9:0]
+font_tb.fontRom01.pos_x[9:0]
+font_tb.fontRom01.row[6:0]
+font_tb.fontRom01.bit[6:0]
+@28
+font_tb.fontRom01.data
+[pattern_trace] 1
+[pattern_trace] 0
