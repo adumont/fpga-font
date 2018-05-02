@@ -1,0 +1,135 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Fri Jan 26 01:14:15 2018
+[*]
+[dumpfile] "/home/adumont/Robotica/Alex/Icezum/Verilog/AutomatonVGA/top_tb.vcd"
+[dumpfile_mtime] "Fri Jan 26 00:19:49 2018"
+[dumpfile_size] 34568
+[savefile] "/home/adumont/Robotica/Alex/Icezum/Verilog/AutomatonVGA/top_tb.gtkw"
+[timestart] 0
+[size] 1678 998
+[pos] -1 -1
+*-4.677804 2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top_tb.
+[treeopen] top_tb.uut.
+[sst_width] 197
+[signals_width] 194
+[sst_expanded] 1
+[sst_vpaned_height] 299
+@28
+top_tb.clk
+@23
+top_tb.uut.x[9:0]
+@800022
+top_tb.uut.data[79:0]
+@28
+(29)top_tb.uut.data[79:0]
+(30)top_tb.uut.data[79:0]
+(31)top_tb.uut.data[79:0]
+(32)top_tb.uut.data[79:0]
+(33)top_tb.uut.data[79:0]
+(34)top_tb.uut.data[79:0]
+(35)top_tb.uut.data[79:0]
+(36)top_tb.uut.data[79:0]
+(37)top_tb.uut.data[79:0]
+(38)top_tb.uut.data[79:0]
+(39)top_tb.uut.data[79:0]
+(40)top_tb.uut.data[79:0]
+(41)top_tb.uut.data[79:0]
+(42)top_tb.uut.data[79:0]
+(43)top_tb.uut.data[79:0]
+(44)top_tb.uut.data[79:0]
+(45)top_tb.uut.data[79:0]
+(46)top_tb.uut.data[79:0]
+(47)top_tb.uut.data[79:0]
+(48)top_tb.uut.data[79:0]
+(49)top_tb.uut.data[79:0]
+top_tb.uut.clk_base
+@800022
+top_tb.uut.image0.dataW[79:0]
+@28
+(0)top_tb.uut.image0.dataW[79:0]
+(1)top_tb.uut.image0.dataW[79:0]
+(2)top_tb.uut.image0.dataW[79:0]
+(3)top_tb.uut.image0.dataW[79:0]
+(4)top_tb.uut.image0.dataW[79:0]
+(5)top_tb.uut.image0.dataW[79:0]
+(6)top_tb.uut.image0.dataW[79:0]
+(7)top_tb.uut.image0.dataW[79:0]
+(8)top_tb.uut.image0.dataW[79:0]
+(9)top_tb.uut.image0.dataW[79:0]
+(10)top_tb.uut.image0.dataW[79:0]
+(11)top_tb.uut.image0.dataW[79:0]
+(12)top_tb.uut.image0.dataW[79:0]
+(13)top_tb.uut.image0.dataW[79:0]
+(14)top_tb.uut.image0.dataW[79:0]
+(15)top_tb.uut.image0.dataW[79:0]
+(16)top_tb.uut.image0.dataW[79:0]
+(17)top_tb.uut.image0.dataW[79:0]
+(18)top_tb.uut.image0.dataW[79:0]
+(19)top_tb.uut.image0.dataW[79:0]
+(20)top_tb.uut.image0.dataW[79:0]
+(21)top_tb.uut.image0.dataW[79:0]
+(22)top_tb.uut.image0.dataW[79:0]
+(23)top_tb.uut.image0.dataW[79:0]
+(24)top_tb.uut.image0.dataW[79:0]
+(25)top_tb.uut.image0.dataW[79:0]
+(26)top_tb.uut.image0.dataW[79:0]
+(27)top_tb.uut.image0.dataW[79:0]
+(28)top_tb.uut.image0.dataW[79:0]
+(29)top_tb.uut.image0.dataW[79:0]
+(30)top_tb.uut.image0.dataW[79:0]
+(31)top_tb.uut.image0.dataW[79:0]
+(32)top_tb.uut.image0.dataW[79:0]
+(33)top_tb.uut.image0.dataW[79:0]
+(34)top_tb.uut.image0.dataW[79:0]
+(35)top_tb.uut.image0.dataW[79:0]
+(36)top_tb.uut.image0.dataW[79:0]
+(37)top_tb.uut.image0.dataW[79:0]
+(38)top_tb.uut.image0.dataW[79:0]
+(39)top_tb.uut.image0.dataW[79:0]
+(40)top_tb.uut.image0.dataW[79:0]
+(41)top_tb.uut.image0.dataW[79:0]
+(42)top_tb.uut.image0.dataW[79:0]
+(43)top_tb.uut.image0.dataW[79:0]
+(44)top_tb.uut.image0.dataW[79:0]
+(45)top_tb.uut.image0.dataW[79:0]
+(46)top_tb.uut.image0.dataW[79:0]
+(47)top_tb.uut.image0.dataW[79:0]
+(48)top_tb.uut.image0.dataW[79:0]
+(49)top_tb.uut.image0.dataW[79:0]
+(50)top_tb.uut.image0.dataW[79:0]
+(51)top_tb.uut.image0.dataW[79:0]
+(52)top_tb.uut.image0.dataW[79:0]
+(53)top_tb.uut.image0.dataW[79:0]
+(54)top_tb.uut.image0.dataW[79:0]
+(55)top_tb.uut.image0.dataW[79:0]
+(56)top_tb.uut.image0.dataW[79:0]
+(57)top_tb.uut.image0.dataW[79:0]
+(58)top_tb.uut.image0.dataW[79:0]
+(59)top_tb.uut.image0.dataW[79:0]
+(60)top_tb.uut.image0.dataW[79:0]
+(61)top_tb.uut.image0.dataW[79:0]
+(62)top_tb.uut.image0.dataW[79:0]
+(63)top_tb.uut.image0.dataW[79:0]
+(64)top_tb.uut.image0.dataW[79:0]
+(65)top_tb.uut.image0.dataW[79:0]
+(66)top_tb.uut.image0.dataW[79:0]
+(67)top_tb.uut.image0.dataW[79:0]
+(68)top_tb.uut.image0.dataW[79:0]
+(69)top_tb.uut.image0.dataW[79:0]
+(70)top_tb.uut.image0.dataW[79:0]
+(71)top_tb.uut.image0.dataW[79:0]
+(72)top_tb.uut.image0.dataW[79:0]
+(73)top_tb.uut.image0.dataW[79:0]
+(74)top_tb.uut.image0.dataW[79:0]
+(75)top_tb.uut.image0.dataW[79:0]
+(76)top_tb.uut.image0.dataW[79:0]
+(77)top_tb.uut.image0.dataW[79:0]
+(78)top_tb.uut.image0.dataW[79:0]
+(79)top_tb.uut.image0.dataW[79:0]
+@1001200
+-group_end
+-group_end
+[pattern_trace] 1
+[pattern_trace] 0
