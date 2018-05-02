@@ -4,7 +4,10 @@ ifndef $(MODULE)
 	MODULE=top
 endif
 ifeq ($(MODULE), top)
-	DEPS=font.v vga_sync.v
+  DEPS:=\
+    font.v \
+    register.v \
+    vga_sync.v
 endif
 
 ifndef $(MEMORY)
