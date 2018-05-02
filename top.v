@@ -41,7 +41,23 @@ module top (
         .px_clk(px_clk)            // Pixel clock
     );
 
-    // buffer vga signals for 1 clock cycle
+    // Address alias in VGAstream 
+    `define Active 0    //  1 bit
+    `define VS 1        //  1 bit
+    `define HS 2        //  1 bit
+    `define YC 12:3     // 10 bits
+    `define XC 22:13    // 10 bits
+    `define R 23        //  1 bit
+    `define G 24        //  1 bit
+    `define B 25        //  1 bit
+    `define VGA 22:0    // 23 bits
+    `define RGB 25:23   //  3 bits
+
+    `define Zoom 1
+
+    // wire [`25:0] VGAstr0, VGAstr1;
+
+    // buffer vga signals for 1 clock cyclevsync1
     wire activevideo1;
     wire [9:0] px_x1, px_y1;
     register #(.W(23)) reg1(
@@ -54,8 +70,8 @@ module top (
 
     font fontRom01 (
         .px_clk(px_clk),      // Pixel clock.
-        .pos_x(px_x0),       // X screen position.
-        .pos_y(px_y0),       // Y screen position.
+        .pos_x(px_x0 >> `Zoom),       // X screen position.
+        .pos_y(px_y0 >> `Zoom),       // Y screen position.
         .character( character ),   // Character to stream.
         .data(pixel_on1)     // Output RGB stream.
     );
@@ -63,8 +79,8 @@ module top (
 // && px_x0[9:3]==7'd 4
 
     assign rgb1 = ( activevideo1 
-                    && px_y1[9:3]==7'd 10
-                    && px_x1[9:3]== 7'd 10
+                    && px_y1[9:3] >> `Zoom == 7'd 1
+                    && px_x1[9:3] >> `Zoom == 7'd 1
                 ) ? { pixel_on1, pixel_on1, pixel_on1 } : 3'b000;
 
 endmodule
