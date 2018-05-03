@@ -5,33 +5,36 @@ module font (
         input wire [9:0]  pos_x,       // X screen position.
         input wire [9:0]  pos_y,       // Y screen position.
         input wire [7:0]  character,   // Character to stream.
-        output reg data
+        output wire data
     );
 
-    parameter FILE_FONT = "font.list";
+    parameter FILE_FONT = "BRAM_8.list";
 
     // Width and height image of font.
-    // 16x16 characters, 8x8 bit each
-    localparam w = 128;  // Font rom width
-    localparam h = 128;  // Font rom height
+    // 16x16 characters, 8x8 col each
+    localparam w = 8;  // Font rom width
+    localparam h = 16*16*8;  // Font rom height
 
     initial
     begin
         $readmemb(FILE_FONT, rom);
     end
 
-    wire [6:0] row;
-    wire [6:0] bit;
+    wire [10:0] row;
+    wire [2:0] col;
 
-    assign row =  { character[7:4] , pos_y[2:0] }; // which row in the FONT rom?
-    assign bit = ~{ character[3:0] , pos_x[2:0] }; // which column in the row? (we reverse with ~ because of how the rom FONT is loaded )
+    assign row =  { character, pos_y[2:0] }; // which row in the FONT rom?
+    assign col =  ~ pos_x[2:0];
 
     // Read Rom Logic
     reg [w-1:0] rom [0:h-1];
+    reg [7:0] dout;
 
     always @(posedge px_clk) begin
-        data <= rom[row][bit];
+        dout <= rom[row];
     end
     // End Read Rom Logic
+    
+    assign data = dout[col];
 
 endmodule

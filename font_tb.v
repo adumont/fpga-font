@@ -14,7 +14,7 @@ module font_tb();
         .px_clk(clk),
         .pos_x(px_x),       // X screen position.
         .pos_y(px_y),       // Y screen position.
-        .character( 8'd 1 ),   // Character to stream.
+        .character( 8'h 37 ),   // Character to stream.
         .data(data)     // Output RGB stream.
     );
 
@@ -24,6 +24,9 @@ module font_tb();
 		//-- Fichero donde almacenar los resultados
 		$dumpfile("font_tb.vcd");
 		$dumpvars(0, font_tb);
+
+		$write("             01234567\n");
+		$write("             --------\n");
 
 		#1
 		for(px_y=0; px_y<8; px_y= px_y+1)

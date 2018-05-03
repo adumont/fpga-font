@@ -68,7 +68,7 @@ module top (
 
     wire pixel_on1;
 
-    font fontRom01 (
+    font font0 (
         .px_clk(px_clk),      // Pixel clock.
         .pos_x(px_x0 >> `Zoom),       // X screen position.
         .pos_y(px_y0 >> `Zoom),       // Y screen position.
@@ -76,7 +76,14 @@ module top (
         .data(pixel_on1)     // Output RGB stream.
     );
 
-// && px_x0[9:3]==7'd 4
+/*     // Tile memory
+    tilemem tilemem0 (
+        .px_clk(px_clk),          // Pixel clock
+        .pos_x((px_x0 >> `Zoom) >> 3),   // X screen position --> we'll compute the tile x,y
+        .pos_y((px_y0 >> `Zoom) >> 3),   // Y screen position.
+        .character(pixel_on1)     // Output --> Char code [0..255]
+    );
+ */
 
     assign rgb1 = ( activevideo1 
                     && px_y1[9:3] >> `Zoom < 7'd 16
