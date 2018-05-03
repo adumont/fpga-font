@@ -5,9 +5,9 @@
 module top (
         input  wire       clk,       // System clock.
 
-        output wire       hsync1,     // Horizontal sync out signal
-        output wire       vsync1,     // Vertical sync out signal
-        output wire [2:0] rgb1,       // Red/Green/Blue VGA signal
+        output wire       hsync,     // Horizontal sync out signal
+        output wire       vsync,     // Vertical sync out signal
+        output wire [2:0] rgb,       // Red/Green/Blue VGA signal
 
         input  wire       sw1,    // board button 1
         input  wire       sw2,    // board button 2
@@ -53,12 +53,12 @@ module top (
     `define VGA 22:0    // 23 bits
     `define RGB 25:23   //  3 bits
 
-    `define Zoom 0
+    `define Zoom 1
 
     // wire [`25:0] VGAstr0, VGAstr1;
 
     // buffer vga signals for 1 clock cyclevsync1
-    wire activevideo1;
+    wire hsync1, vsync1, activevideo1;
     wire [9:0] px_x1, px_y1;
     register #(.W(23)) reg1(
         .clk( px_clk ),
@@ -72,7 +72,7 @@ module top (
         .px_clk(px_clk),      // Pixel clock.
         .pos_x(px_x0 >> `Zoom),       // X screen position.
         .pos_y(px_y0 >> `Zoom),       // Y screen position.
-        .character( (px_x0 >> `Zoom) >> 3 ),   // Character to stream.
+        .character( 8'd 1 ),   // Character to stream.
         .data(pixel_on1)     // Output RGB stream.
     );
 
@@ -85,9 +85,21 @@ module top (
     );
  */
 
-    assign rgb1 = ( activevideo1 
-                    && px_y1[9:3] >> `Zoom < 7'd 16
-                    //&& px_x1[9:3] >> `Zoom < 7'd 16
-                ) ? { pixel_on1, pixel_on1, pixel_on1 } : 3'b000;
+    always @(*) begin
+        rgb <= 3'b000;
+        if (activevideo1) begin
+            if( px_y1[9:3] >> `Zoom == 7'd 10
+                && px_x1[9:3] >> `Zoom == 7'd 0 )
+                rgb <= pixel_on1 ? 3'b010 : 3'b000;
+            // else if (px_y1 == 0 || px_y1 == 479 || px_x1 == 0 || px_x1 == 639 ) 
+            //     rgb <= 3'b001;
+            else
+                rgb <= 3'b000;
+        end
+        else
+            rgb <= 3'b000;
+    end
 
+    assign hsync = hsync1;
+    assign vsync = vsync1;
 endmodule

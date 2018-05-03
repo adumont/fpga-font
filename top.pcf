@@ -1,9 +1,9 @@
 set_io   clk               21
-set_io   hsync1             37
-set_io   vsync1             39
-set_io   rgb1[0]            38
-set_io   rgb1[1]            41
-set_io   rgb1[2]            43
+set_io   hsync             37
+set_io   vsync             39
+set_io   rgb[0]            38
+set_io   rgb[1]            41
+set_io   rgb[2]            43
 set_io   sw1               10
 set_io   sw2               11
 
