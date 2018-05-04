@@ -7,7 +7,7 @@ module top (
 
         output wire       hsync,     // Horizontal sync out signal
         output wire       vsync,     // Vertical sync out signal
-        output wire [2:0] rgb,       // Red/Green/Blue VGA signal
+        output reg  [2:0] rgb,       // Red/Green/Blue VGA signal
 
         input  wire       sw1,    // board button 1
         input  wire       sw2,    // board button 2
@@ -17,9 +17,6 @@ module top (
     // avoid warning if we don't use led
     assign leds = 8'b 0100_0010;
     
-    wire [7:0] character;
-    assign character = 8'h 33;
-
     // Output signals from VGA sync
     wire px_clk;
     wire hsync0, vsync0, activevideo0;
@@ -60,8 +57,8 @@ module top (
     // STAGE 1
 
     // buffer vga signals for 1 clock cycle 
-    wire [9:0] px_x1, px_y1;
-    wire [9:0] px_x2, px_y2;
+    reg [9:0] px_x1, px_y1;
+    reg [9:0] px_x2, px_y2;
 
     always @( posedge px_clk) begin
       { px_x1, px_y1 } <= { px_x0, px_y0 };
