@@ -15,6 +15,8 @@ module font (
     localparam w = 8;  // Font rom width
     localparam h = 16*16*8;  // Font rom height
 
+    reg [w-1:0] rom [0:h-1];
+
     initial
     begin
         $readmemb(FILE_FONT, rom);
@@ -27,14 +29,9 @@ module font (
     assign col =  ~ pos_x[2:0];
 
     // Read Rom Logic
-    reg [w-1:0] rom [0:h-1];
-    reg [7:0] dout;
-
     always @(posedge px_clk) begin
-        dout <= rom[row];
+        data <= rom[row];
     end
     // End Read Rom Logic
-    
-    assign data = dout[col];
 
 endmodule
