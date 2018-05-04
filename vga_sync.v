@@ -140,8 +140,8 @@ module vga_sync (
     assign vsync = (vc >= vfp && vc < vfp + vpulse) ? 0:1;
     assign activevideo = (hc >= blackH && vc >= blackV) ? 1:0;
 
-    // Generate color.
-    always @(posedge px_clk)
+    // Combinational
+    always @(*)
     begin
         // First check if we are within vertical active video range.
         if (activevideo)

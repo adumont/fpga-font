@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Fri May  4 23:02:29 2018
+[*] Fri May  4 23:33:11 2018
 [*]
 [dumpfile] "/home/adumont/projects/Font/top_tb.vcd"
-[dumpfile_mtime] "Fri May  4 22:49:10 2018"
-[dumpfile_size] 33665203
+[dumpfile_mtime] "Fri May  4 23:27:58 2018"
+[dumpfile_size] 33665258
 [savefile] "/home/adumont/projects/Font/top_tb.gtkw"
-[timestart] 66924
+[timestart] 66918
 [size] 1678 998
 [pos] -1 -1
 *-3.677804 66943 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -26,6 +26,7 @@ top_tb.top0.vga_sync0.px_clk
 @24
 top_tb.top0.vga_sync0.vc[9:0]
 top_tb.top0.vga_sync0.hc[9:0]
+[color] 2
 top_tb.top0.vga_sync0.x_px[9:0]
 top_tb.top0.vga_sync0.y_px[9:0]
 @28
@@ -40,18 +41,21 @@ top_tb.top0.ram0.raddr[6:0]
 top_tb.top0.ram0.dout[7:0]
 @200
 -font
-@23
-top_tb.top0.font0.character[7:0]
 @22
+top_tb.top0.font0.character[7:0]
 top_tb.top0.font0.row[10:0]
 @24
 top_tb.top0.font0.col[2:0]
+@28
+top_tb.top0.font0.data
 @200
 -pixel
 @24
 top_tb.top0.px_x0[9:0]
 top_tb.top0.px_x1[9:0]
+@25
 top_tb.top0.px_x2[9:0]
+@24
 top_tb.top0.px_y0[9:0]
 top_tb.top0.px_y1[9:0]
 top_tb.top0.px_y2[9:0]
