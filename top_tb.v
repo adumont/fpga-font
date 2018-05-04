@@ -5,7 +5,24 @@ module top_tb();
 	//-- Generador de reloj. Periodo 2 unidades
 	always #1 clk = ~clk;
 
-	top #( .N(1) ) uut ( .clk(clk)	);
+	wire       hsync;     // Horizontal sync out signal
+	wire       vsync;     // Vertical sync out signal
+	wire [2:0] rgb;       // Red/Green/Blue VGA signal
+
+	reg       sw1;    // board button 1
+	reg       sw2;    // board button 2
+	wire [7:0] leds;       // board leds
+
+	// top #( .N(1) ) uut ( .clk(clk)	);
+	top top0 (
+		.clk(clk),
+		.hsync(hsync),
+		.vsync(vsync),
+		.rgb(rgb),
+		.sw1(sw1),
+		.sw2(sw2),
+		.leds(leds)
+	);
 
 	//-- Proceso al inicio
 	initial begin
@@ -14,7 +31,7 @@ module top_tb();
 		$dumpfile("top_tb.vcd");
 		$dumpvars(0, top_tb);
 
-		# 85 $display("FIN de la simulacion");
+		# 700000 $display("FIN de la simulacion");
 		$finish;
 
 	end
