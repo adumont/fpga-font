@@ -6,8 +6,7 @@ endif
 ifeq ($(MODULE), top)
   DEPS:=\
     font.v \
-    tileram.v \
-    register.v \
+    ram.v \
     vga_sync.v
 endif
 

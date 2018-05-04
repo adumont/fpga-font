@@ -53,57 +53,55 @@ module top (
     `define VGA 22:0    // 23 bits
     `define RGB 25:23   //  3 bits
 
-    `define Zoom 1
+    `define Zoom 0
 
     // wire [`25:0] VGAstr0, VGAstr1;
 
     // STAGE 1
 
     // buffer vga signals for 1 clock cycle 
-    wire hsync1, vsync1, activevideo1;
     wire [9:0] px_x1, px_y1;
-
-    register #(.W(23)) reg1(
-        .clk( px_clk ),
-        .in(  {hsync0, vsync0, activevideo0, px_x0, px_y0 } ),
-        .out( {hsync1, vsync1, activevideo1, px_x1, px_y1 } )
-    );
-
-    wire [7:0] char_code;
-
-    tileram #( .ZOOM(`Zoom) ) tileram0 (
-        .Rclk( px_clk ),
-        .Raddr( { px_x0[9:3+`Zoom] } ),
-        .Rdata( char_code )
-    );
-
-    // STAGE 2
-    wire pixel_on;
-
-    wire hsync2, vsync2, activevideo2;
     wire [9:0] px_x2, px_y2;
 
-    register #(.W(23)) reg2(
-        .clk( px_clk ),
-        .in(  {hsync1, vsync1, activevideo1, px_x1, px_y1 } ),
-        .out( {hsync2, vsync2, activevideo2, px_x2, px_y2 } )
+    always @( posedge px_clk) begin
+      { px_x1, px_y1 } <= { px_x0, px_y0 };
+      { px_x2, px_y2 } <= { px_x1, px_y1 };
+    end
+
+    wire [7:0] char_code;
+    wire [6:0] raddr;
+    wire [7:0] rdata;
+
+    assign raddr = px_x0[9:(3+`Zoom)]; // for now, we address only 1 line
+
+    ram #( .Zoom(`Zoom) ) ram0 (
+        .rclk( px_clk ),
+        .raddr( raddr ),
+        .dout( rdata ),
+        .wclk( px_clk ),
+        .write_en( 1'b0 ) // disable write port for now
     );
+
+    assign char_code = rdata;
+
+    // STAGE 2
+    wire font_bit;
 
     font font0 (
         .px_clk(px_clk),      // Pixel clock.
         .pos_x(px_x1 >> `Zoom),       // X screen position.
         .pos_y(px_y1 >> `Zoom),       // Y screen position.
         .character( char_code ),   // Character to stream.
-        .data(pixel_on)     // Output RGB stream.
+        .data( font_bit )     // Output RGB stream.
     );
 
     always @(*) begin
         rgb <= 3'b000;
-        if (activevideo2) begin
+        if (activevideo0) begin
             if( px_y2[9:3] >> `Zoom == 7'd 10
                 //&& px_x2[9:3] >> `Zoom == 7'd 0 
                 )
-                rgb <= pixel_on ? 3'b010 : 3'b000;
+                rgb <= font_bit ? 3'b010 : 3'b000;
             // else if (px_y1 == 0 || px_y1 == 479 || px_x1 == 0 || px_x1 == 639 ) 
             //     rgb <= 3'b001;
             else
@@ -113,6 +111,6 @@ module top (
             rgb <= 3'b000;
     end
 
-    assign hsync = hsync2;
-    assign vsync = vsync2;
+    assign hsync = hsync0;
+    assign vsync = vsync0;
 endmodule
