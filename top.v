@@ -57,40 +57,53 @@ module top (
 
     // wire [`25:0] VGAstr0, VGAstr1;
 
-    // buffer vga signals for 1 clock cyclevsync1
+    // STAGE 1
+
+    // buffer vga signals for 1 clock cycle 
     wire hsync1, vsync1, activevideo1;
     wire [9:0] px_x1, px_y1;
+
     register #(.W(23)) reg1(
         .clk( px_clk ),
         .in(  {hsync0, vsync0, activevideo0, px_x0, px_y0 } ),
         .out( {hsync1, vsync1, activevideo1, px_x1, px_y1 } )
     );
 
-    wire pixel_on1;
+    wire [7:0] char_code;
+
+    tileram #( .ZOOM(`Zoom) ) tileram0 (
+        .Rclk( px_clk ),
+        .Raddr( { px_x0[9:3+`Zoom] } ),
+        .Rdata( char_code )
+    );
+
+    // STAGE 2
+    wire pixel_on;
+
+    wire hsync2, vsync2, activevideo2;
+    wire [9:0] px_x2, px_y2;
+
+    register #(.W(23)) reg2(
+        .clk( px_clk ),
+        .in(  {hsync1, vsync1, activevideo1, px_x1, px_y1 } ),
+        .out( {hsync2, vsync2, activevideo2, px_x2, px_y2 } )
+    );
 
     font font0 (
         .px_clk(px_clk),      // Pixel clock.
-        .pos_x(px_x0 >> `Zoom),       // X screen position.
-        .pos_y(px_y0 >> `Zoom),       // Y screen position.
-        .character( 8'd 1 ),   // Character to stream.
-        .data(pixel_on1)     // Output RGB stream.
+        .pos_x(px_x1 >> `Zoom),       // X screen position.
+        .pos_y(px_y1 >> `Zoom),       // Y screen position.
+        .character( char_code ),   // Character to stream.
+        .data(pixel_on)     // Output RGB stream.
     );
-
-/*     // Tile memory
-    tilemem tilemem0 (
-        .px_clk(px_clk),          // Pixel clock
-        .pos_x((px_x0 >> `Zoom) >> 3),   // X screen position --> we'll compute the tile x,y
-        .pos_y((px_y0 >> `Zoom) >> 3),   // Y screen position.
-        .character(pixel_on1)     // Output --> Char code [0..255]
-    );
- */
 
     always @(*) begin
         rgb <= 3'b000;
-        if (activevideo1) begin
-            if( px_y1[9:3] >> `Zoom == 7'd 10
-                && px_x1[9:3] >> `Zoom == 7'd 0 )
-                rgb <= pixel_on1 ? 3'b010 : 3'b000;
+        if (activevideo2) begin
+            if( px_y2[9:3] >> `Zoom == 7'd 10
+                //&& px_x2[9:3] >> `Zoom == 7'd 0 
+                )
+                rgb <= pixel_on ? 3'b010 : 3'b000;
             // else if (px_y1 == 0 || px_y1 == 479 || px_x1 == 0 || px_x1 == 639 ) 
             //     rgb <= 3'b001;
             else
@@ -100,6 +113,6 @@ module top (
             rgb <= 3'b000;
     end
 
-    assign hsync = hsync1;
-    assign vsync = vsync1;
+    assign hsync = hsync2;
+    assign vsync = vsync2;
 endmodule
