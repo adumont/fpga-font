@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Sat May  5 13:24:49 2018
+[*] Sat May  5 17:55:44 2018
 [*]
 [dumpfile] "/home/adumont/projects/Font/top_tb.vcd"
-[dumpfile_mtime] "Fri May  4 23:27:58 2018"
-[dumpfile_size] 33665258
+[dumpfile_mtime] "Sat May  5 17:53:44 2018"
+[dumpfile_size] 35031085
 [savefile] "/home/adumont/projects/Font/top_tb.gtkw"
 [timestart] 70257
 [size] 1678 998
 [pos] -1 -1
-*-3.677804 70271 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-3.677804 70275 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.top0.
 [treeopen] top_tb.top0.font0.
@@ -24,9 +24,8 @@ top_tb.clk
 -vga_sync
 @28
 top_tb.top0.vga_sync0.px_clk
-@25
-top_tb.top0.vga_sync0.vc[9:0]
 @24
+top_tb.top0.vga_sync0.vc[9:0]
 top_tb.top0.vga_sync0.hc[9:0]
 [color] 2
 top_tb.top0.vga_sync0.x_px[9:0]
@@ -38,11 +37,14 @@ top_tb.top0.vga_sync0.hsync
 top_tb.top0.vga_sync0.vsync
 [color] 3
 top_tb.top0.vga_sync0.activevideo
+top_tb.top0.activevideo0
+top_tb.top0.activevideo1
+@29
+top_tb.top0.activevideo2
 @200
 -tile ram
 @22
 top_tb.top0.ram0.raddr[6:0]
-top_tb.top0.ram0.dout[7:0]
 @200
 -font
 @c00022
