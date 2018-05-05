@@ -15,21 +15,21 @@ module ram #(
         input [data_width-1:0] din
     );
 
-    //reg [data_width-1:0] mem [(1<<addr_width)-1:0];
-    reg [data_width-1:0] mem [79:0];
+    reg [data_width-1:0] mem [(1<<addr_width)-1:0];
+    //reg [data_width-1:0] mem [79:0];
 
     parameter ROMFILE = "ram.list";
     initial begin
-        // $readmemh(ROMFILE, mem);
+        $readmemh(ROMFILE, mem);
         dout=0;
-        mem[0] = 8'h30; 
-        mem[1] = 8'h31;
-        mem[2] = 8'h32;
-        mem[3] = 8'h33;
-        mem[4] = 8'h34; 
-        mem[5] = 8'h35;
-        mem[6] = 8'h36;
-        mem[7] = 8'h37;
+        // mem[0] = 8'h30; 
+        // mem[1] = 8'h31;
+        // mem[2] = 8'h32;
+        // mem[3] = 8'h33;
+        // mem[4] = 8'h34; 
+        // mem[5] = 8'h35;
+        // mem[6] = 8'h36;
+        // mem[7] = 8'h37;
 
         // $writememh("saved_ram.list",mem);
     end
