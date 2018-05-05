@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Sat May  5 15:38:32 2018
+[*]
+[dumpfile] "/home/adumont/projects/Font/ram_tb.vcd"
+[dumpfile_mtime] "Sat May  5 15:37:53 2018"
+[dumpfile_size] 3803
+[savefile] "/home/adumont/projects/Font/ram_tb.gtkw"
+[timestart] 2
+[size] 1488 850
+[pos] 563 -15
+*-2.669391 3 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] ram_tb.
+[sst_width] 197
+[signals_width] 138
+[sst_expanded] 1
+[sst_vpaned_height] 245
+@28
+ram_tb.clk
+@22
+ram_tb.x_px[6:0]
+ram_tb.rdata[7:0]
+@200
+-
+@22
+ram_tb.ram0.dout[7:0]
+ram_tb.ram0.din[7:0]
+ram_tb.ram0.dout[7:0]
+ram_tb.ram0.raddr[6:0]
+ram_tb.ram0.waddr[6:0]
+@28
+ram_tb.ram0.wclk
+@29
+ram_tb.ram0.write_en
+[pattern_trace] 1
+[pattern_trace] 0

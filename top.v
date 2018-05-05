@@ -59,26 +59,30 @@ module top (
     // buffer vga signals for 1 clock cycle 
     reg [9:0] px_x1, px_y1;
     reg [9:0] px_x2, px_y2;
+    reg hsync1, vsync1, activevideo1;
+    reg hsync2, vsync2, activevideo2;
 
     always @( posedge px_clk) begin
-      { px_x1, px_y1 } <= { px_x0, px_y0 };
-      { px_x2, px_y2 } <= { px_x1, px_y1 };
+      { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
+      { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
     end
 
     wire [7:0] char_code;
     wire [6:0] raddr;
     wire [7:0] rdata;
 
-    assign raddr = px_x0[9:(3+`Zoom)]; // for now, we address only 1 line
+    // px_y2[9:(3+`Zoom)] + 
+    //assign raddr = 0;
+    assign raddr = {px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
 
-    ram #( .Zoom(`Zoom) ) ram0 (
+    ram #( .Zoom(`Zoom), .addr_width(7), .data_width(8) ) ram0 (
         .rclk( px_clk ),
         .raddr( raddr ),
         .dout( rdata ),
         .wclk( px_clk ),
         .write_en( 1'b0 ) // disable write port for now
     );
-
+    
     assign char_code = rdata;
 
     // STAGE 2
@@ -86,21 +90,22 @@ module top (
 
     font font0 (
         .px_clk(px_clk),      // Pixel clock.
-        .pos_x(px_x1 >> `Zoom),       // X screen position.
-        .pos_y(px_y1 >> `Zoom),       // Y screen position.
+        .pos_x( px_x1 >> `Zoom ),       // X screen position.
+        .pos_y( px_y1 >> `Zoom ),       // Y screen position.
         .character( char_code ),   // Character to stream.
         .data( font_bit )     // Output RGB stream.
     );
 
     always @(*) begin
         rgb <= 3'b000;
-        if (activevideo0) begin
-            if( px_y2[9:3] >> `Zoom == 7'd 10
-                //&& px_x2[9:3] >> `Zoom == 7'd 0 
+        if (activevideo2) begin
+            // rgb <= font_bit ? 3'b010 : 3'b000;
+            if( px_y2[9:3] >> `Zoom == 7'd 1 // line 1 (not 0)
+                //&& px_x2[9:3] >> `Zoom <= 7'd 9
                 )
                 rgb <= font_bit ? 3'b010 : 3'b000;
-            // else if (px_y1 == 0 || px_y1 == 479 || px_x1 == 0 || px_x1 == 639 ) 
-            //     rgb <= 3'b001;
+            else if (px_y2 == 0 || px_y2 == 479 || px_x2 == 0 || px_x2 == 639 ) 
+                rgb <= 3'b001;
             else
                 rgb <= 3'b000;
         end
@@ -108,6 +113,6 @@ module top (
             rgb <= 3'b000;
     end
 
-    assign hsync = hsync0;
-    assign vsync = vsync0;
+    assign hsync = hsync2;
+    assign vsync = vsync2;
 endmodule
