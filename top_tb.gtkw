@@ -1,17 +1,18 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Fri May  4 23:33:11 2018
+[*] Sat May  5 13:24:49 2018
 [*]
 [dumpfile] "/home/adumont/projects/Font/top_tb.vcd"
 [dumpfile_mtime] "Fri May  4 23:27:58 2018"
 [dumpfile_size] 33665258
 [savefile] "/home/adumont/projects/Font/top_tb.gtkw"
-[timestart] 66918
+[timestart] 70257
 [size] 1678 998
 [pos] -1 -1
-*-3.677804 66943 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-3.677804 70271 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top_tb.
 [treeopen] top_tb.top0.
+[treeopen] top_tb.top0.font0.
 [treeopen] top_tb.top0.vga_sync0.
 [sst_width] 197
 [signals_width] 230
@@ -23,14 +24,17 @@ top_tb.clk
 -vga_sync
 @28
 top_tb.top0.vga_sync0.px_clk
-@24
+@25
 top_tb.top0.vga_sync0.vc[9:0]
+@24
 top_tb.top0.vga_sync0.hc[9:0]
 [color] 2
 top_tb.top0.vga_sync0.x_px[9:0]
 top_tb.top0.vga_sync0.y_px[9:0]
 @28
+[color] 7
 top_tb.top0.vga_sync0.hsync
+[color] 7
 top_tb.top0.vga_sync0.vsync
 [color] 3
 top_tb.top0.vga_sync0.activevideo
@@ -41,10 +45,36 @@ top_tb.top0.ram0.raddr[6:0]
 top_tb.top0.ram0.dout[7:0]
 @200
 -font
-@22
+@c00022
 top_tb.top0.font0.character[7:0]
-top_tb.top0.font0.row[10:0]
+@28
+(0)top_tb.top0.font0.character[7:0]
+(1)top_tb.top0.font0.character[7:0]
+(2)top_tb.top0.font0.character[7:0]
+(3)top_tb.top0.font0.character[7:0]
+(4)top_tb.top0.font0.character[7:0]
+(5)top_tb.top0.font0.character[7:0]
+(6)top_tb.top0.font0.character[7:0]
+(7)top_tb.top0.font0.character[7:0]
+@1401200
+-group_end
+@c00022
+top_tb.top0.font0.pos_y[9:0]
+@28
+(0)top_tb.top0.font0.pos_y[9:0]
+(1)top_tb.top0.font0.pos_y[9:0]
+(2)top_tb.top0.font0.pos_y[9:0]
+(3)top_tb.top0.font0.pos_y[9:0]
+(4)top_tb.top0.font0.pos_y[9:0]
+(5)top_tb.top0.font0.pos_y[9:0]
+(6)top_tb.top0.font0.pos_y[9:0]
+(7)top_tb.top0.font0.pos_y[9:0]
+(8)top_tb.top0.font0.pos_y[9:0]
+(9)top_tb.top0.font0.pos_y[9:0]
+@1401200
+-group_end
 @24
+top_tb.top0.font0.row[10:0]
 top_tb.top0.font0.col[2:0]
 @28
 top_tb.top0.font0.data
@@ -53,9 +83,7 @@ top_tb.top0.font0.data
 @24
 top_tb.top0.px_x0[9:0]
 top_tb.top0.px_x1[9:0]
-@25
 top_tb.top0.px_x2[9:0]
-@24
 top_tb.top0.px_y0[9:0]
 top_tb.top0.px_y1[9:0]
 top_tb.top0.px_y2[9:0]
