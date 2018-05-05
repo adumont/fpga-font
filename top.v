@@ -55,7 +55,6 @@ module top (
     // wire [`25:0] VGAstr0, VGAstr1;
 
     // STAGE 1
-
     // buffer vga signals for 1 clock cycle 
     reg [9:0] px_x1, px_y1;
     reg [9:0] px_x2, px_y2;
@@ -67,13 +66,20 @@ module top (
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
     end
 
-    wire [7:0] char_code;
     wire [6:0] raddr;
     wire [7:0] rdata;
 
     // px_y2[9:(3+`Zoom)] + 
     //assign raddr = 0;
-    assign raddr = {px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+
+    reg [7:0] char_code;
+    assign raddr = {3'b000, px_x0[6:3]}; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+
+    // Delayed one cycle of clock data from RAM.
+    always @(posedge px_clk)
+    begin
+         char_code <= rdata;
+    end
 
     ram #( .Zoom(`Zoom), .addr_width(7), .data_width(8) ) ram0 (
         .rclk( px_clk ),
@@ -83,15 +89,13 @@ module top (
         .write_en( 1'b0 ) // disable write port for now
     );
     
-    assign char_code = rdata;
-
     // STAGE 2
     wire font_bit;
 
     font font0 (
         .px_clk(px_clk),      // Pixel clock.
-        .pos_x( px_x1 >> `Zoom ),       // X screen position.
-        .pos_y( px_y1 >> `Zoom ),       // Y screen position.
+        .pos_x( px_x2 >> `Zoom ),       // X screen position.
+        .pos_y( px_y2 >> `Zoom ),       // Y screen position.
         .character( char_code ),   // Character to stream.
         .data( font_bit )     // Output RGB stream.
     );
