@@ -50,7 +50,7 @@ module top (
     `define VGA 22:0    // 23 bits
     `define RGB 25:23   //  3 bits
 
-    `define Zoom 0
+    `define Zoom 1
 
     // wire [`25:0] VGAstr0, VGAstr1;
 
@@ -73,7 +73,7 @@ module top (
     //assign raddr = 0;
 
     reg [7:0] char_code;
-    assign raddr = {3'b000, px_x0[6:3]}; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+    assign raddr = { 1'b 0, px_x0[9:(3+`Zoom)] }; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
 
     // Delayed one cycle of clock data from RAM.
     always @(posedge px_clk)
