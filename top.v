@@ -73,9 +73,10 @@ module top (
 
     // px_y2[9:(3+`Zoom)] + 
     //assign raddr = 0;
-    assign raddr = {px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+    //assign raddr = {px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+    assign raddr = { px_x0[9:3] }; // for now, we address only 1 line
 
-    ram #( .Zoom(`Zoom), .addr_width(7), .data_width(8) ) ram0 (
+    ram #( .Zoom(`Zoom), .addr_width(7), .data_width(12) ) ram0 (
         .rclk( px_clk ),
         .raddr( raddr ),
         .dout( rdata ),
@@ -100,7 +101,7 @@ module top (
         rgb <= 3'b000;
         if (activevideo2) begin
             // rgb <= font_bit ? 3'b010 : 3'b000;
-            if( px_y2[9:3] >> `Zoom == 7'd 1 // line 1 (not 0)
+            if( px_y2[9:3] >> `Zoom == 7'd 0 // line 1 (not 0)
                 //&& px_x2[9:3] >> `Zoom <= 7'd 9
                 )
                 rgb <= font_bit ? 3'b010 : 3'b000;
