@@ -73,7 +73,7 @@ module top (
     //assign raddr = 0;
 
     reg [7:0] char_code;
-    assign raddr = px_y0[9:(3+`Zoom)]*80 + px_x0[9:(3+`Zoom)]; //{3'b000, px_x0[6:3]}; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+    assign raddr = px_y0[9:(3+`Zoom)]*(80/(2**`Zoom)) + px_x0[9:(3+`Zoom)]; //{3'b000, px_x0[6:3]}; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
 
     // Delayed one cycle of clock data from RAM.
     always @(posedge px_clk)
