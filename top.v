@@ -55,15 +55,19 @@ module top (
     // wire [`25:0] VGAstr0, VGAstr1;
 
     // STAGE 1
+
     // buffer vga signals for 1 clock cycle 
     reg [9:0] px_x1, px_y1;
     reg [9:0] px_x2, px_y2;
+    reg [9:0] px_x3, px_y3;
     reg hsync1, vsync1, activevideo1;
     reg hsync2, vsync2, activevideo2;
+    reg hsync3, vsync3, activevideo3;
 
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
+      { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
     end
 
     wire [6:0] raddr;
@@ -73,7 +77,7 @@ module top (
     //assign raddr = 0;
 
     reg [7:0] char_code;
-    assign raddr = { 1'b 0, px_x0[9:(3+`Zoom)] }; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
+    assign raddr = { px_y0[8:(3+`Zoom)] , px_x0[9:(3+`Zoom)] }; //{px_y0[9:3], px_x0[9:3]}; // for now, we address only 1 line
 
     // Delayed one cycle of clock data from RAM.
     always @(posedge px_clk)
@@ -81,7 +85,7 @@ module top (
          char_code <= rdata;
     end
 
-    ram #( .Zoom(`Zoom), .addr_width(7), .data_width(8) ) ram0 (
+    ram #( .addr_width( 13-2*`Zoom ), .data_width( 8 ) ) ram0 (
         .rclk( px_clk ),
         .raddr( raddr ),
         .dout( rdata ),
@@ -100,15 +104,19 @@ module top (
         .data( font_bit )     // Output RGB stream.
     );
 
+    // TODO: Embed in a combination block
+    // takes input: stream 3
+    // TODO: place register at the end to sinc... (stream4)
+
     always @(*) begin
         rgb <= 3'b000;
-        if (activevideo2) begin
+        if (activevideo3) begin
             // rgb <= font_bit ? 3'b010 : 3'b000;
-            if( px_y2[9:3] >> `Zoom == 7'd 1 // line 1 (not 0)
+            if( px_y3[9:3] >> `Zoom < 7'd 02 // line 1 (not 0)
                 //&& px_x2[9:3] >> `Zoom <= 7'd 9
                 )
                 rgb <= font_bit ? 3'b010 : 3'b000;
-            else if (px_y2 == 0 || px_y2 == 479 || px_x2 == 0 || px_x2 == 639 ) 
+            else if (px_y3 == 0 || px_y3 == 479 || px_x3 == 0 || px_x3 == 639 ) 
                 rgb <= 3'b001;
             else
                 rgb <= 3'b000;
@@ -117,6 +125,6 @@ module top (
             rgb <= 3'b000;
     end
 
-    assign hsync = hsync2;
-    assign vsync = vsync2;
+    assign hsync = hsync3;
+    assign vsync = vsync3;
 endmodule

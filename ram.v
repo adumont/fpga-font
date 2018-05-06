@@ -1,7 +1,6 @@
 `default_nettype none
 
 module ram #(
-        parameter Zoom = 0, 
         parameter addr_width =  7,
         parameter data_width =  8
     ) (
