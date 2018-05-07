@@ -15,7 +15,6 @@ module ram #(
     );
 
     reg [data_width-1:0] mem [(1<<addr_width)-1:0];
-    // reg [data_width-1:0] mem [79:0];
 
     parameter ROMFILE = "ram65.list";
     initial begin
@@ -26,7 +25,7 @@ module ram #(
 
     always @(posedge rclk) // Read memory
     begin
-        dout <= mem[raddr]; // no funciona!? (sintetizado)
+        dout <= mem[raddr];
     end
 
     always @(posedge wclk) // Write memory.
