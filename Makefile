@@ -8,6 +8,12 @@ ifeq ($(MODULE), top)
     font.v \
     ram.v \
     vga_sync.v
+
+  AUXFILES:=\
+    ram.list\
+    ram65.list
+
+# YOSYSOPT:=-retime -abc2
 endif
 
 ifndef $(MEMORY)
@@ -21,15 +27,16 @@ sim: $(MODULE)_tb.vcd
 json: $(MODULE).json
 svg: assets/$(MODULE).svg
 
-$(MODULE)_tb.vcd: $(MODULE).v $(DEPS) $(MODULE)_tb.v
+$(MODULE)_tb.vcd: $(MODULE).v $(DEPS) $(MODULE)_tb.v  $(AUXFILES)
 
 	iverilog $^ -o $(MODULE)_tb.out
 	./$(MODULE)_tb.out
 	gtkwave $@ $(MODULE)_tb.gtkw &
 
-$(MODULE).bin: $(MODULE).pcf $(MODULE).v $(DEPS)
+$(MODULE).bin: $(MODULE).pcf $(MODULE).v $(DEPS) $(AUXFILES)
 	
-	yosys -p "synth_ice40 -blif $(MODULE).blif" $(MODULE).v $(DEPS)
+	yosys -p "synth_ice40 -blif $(MODULE).blif $(YOSYSOPT)"\
+              -l $(MODULE).log -q $(MODULE).v $(DEPS)
 	
 	arachne-pnr -d $(MEMORY) -p $(MODULE).pcf $(MODULE).blif -o $(MODULE).pnr
 	
