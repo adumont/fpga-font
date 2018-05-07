@@ -70,18 +70,17 @@ module top (
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
     end
 
-    wire [6:0] raddr;
-    wire [7:0] rdata;
-
-    reg [7:0] char_code;
+    wire [(13-2*`Zoom)-1:0] raddr;
     assign raddr = { px_y0[9:(3+`Zoom)] , px_x0[9:(3+`Zoom)] };
     
     // Delayed one cycle of clock data from RAM.
+    reg [7:0] char_code;
     always @(posedge px_clk)
     begin
          char_code <= rdata;
     end
 
+    wire [7:0] rdata;
     ram #( .addr_width( 13-2*`Zoom ), .data_width( 8 ) ) ram0 (
         .rclk( px_clk ),
         .raddr( raddr ),
