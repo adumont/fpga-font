@@ -1,7 +1,7 @@
 `default_nettype none
 
 module ram #(
-        parameter addr_width =  7,
+        parameter addr_width =  11,
         parameter data_width =  8
     ) (
         // din, write_en, waddr, wclk, raddr, rclk, dout
@@ -17,7 +17,7 @@ module ram #(
     reg [data_width-1:0] mem [(1<<addr_width)-1:0];
     // reg [data_width-1:0] mem [79:0];
 
-    parameter ROMFILE = "ram.list";
+    parameter ROMFILE = "ram65.list";
     initial begin
         $readmemh(ROMFILE, mem);
         dout=0;
