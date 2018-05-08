@@ -16,9 +16,9 @@ module ram #(
 
     reg [data_width-1:0] mem [(1<<addr_width)-1:0];
 
-    parameter ROMFILE = "ram65.list";
+    parameter ROMFILE = "";
     initial begin
-        $readmemh(ROMFILE, mem);
+        if(ROMFILE) $readmemh(ROMFILE, mem);
         dout=0;
         // $writememh("saved_ram.list",mem);
     end

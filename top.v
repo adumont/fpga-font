@@ -1,4 +1,5 @@
 `default_nettype none
+`include "const.vh"
 
 // check connections to VGA adapter on https://github.com/Obijuan/MonsterLED/wiki
 
@@ -38,18 +39,6 @@ module top (
         .px_clk(px_clk)            // Pixel clock
     );
 
-    // Address alias in VGAstream 
-    `define Active 0    //  1 bit
-    `define VS 1        //  1 bit
-    `define HS 2        //  1 bit
-    `define YC 12:3     // 10 bits
-    `define XC 22:13    // 10 bits
-    `define R 23        //  1 bit
-    `define G 24        //  1 bit
-    `define B 25        //  1 bit
-    `define VGA 22:0    // 23 bits
-    `define RGB 25:23   //  3 bits
-
     `define Zoom 1
 
     // wire [`25:0] VGAstr0, VGAstr1;
@@ -64,31 +53,25 @@ module top (
     reg hsync2, vsync2, activevideo2;
     reg hsync3, vsync3, activevideo3;
 
+    reg [25:0] RGBStr0, RGBStr1, RGBStr2, RGBStr3;
+
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
+      RGBStr0 <= { 3'b000, px_x0, px_y0, hsync0, vsync0, activevideo0 };
+      RGBStr1 <= RGBStr0;
+      RGBStr2 <= RGBStr1;
+      RGBStr3 <= RGBStr2;
     end
 
-    wire [(13-2*`Zoom)-1:0] raddr;
-    assign raddr = { px_y0[9:(3+`Zoom)] , px_x0[9:(3+`Zoom)] };
-    
-    // Delayed one cycle of clock data from RAM.
-    reg [7:0] char_code;
-    always @(posedge px_clk)
-    begin
-         char_code <= rdata;
-    end
-
-    wire [7:0] rdata;
-    ram #( .addr_width( 13-2*`Zoom ), .data_width( 8 ) ) ram0 (
-        .rclk( px_clk ),
-        .raddr( raddr ),
-        .dout( rdata ),
-        .wclk( px_clk ),
-        .write_en( 1'b0 ) // disable write port for now
+    wire [ 7:0] char_code;
+    tilemem #( .ZOOM( `Zoom ) ) tilemem0 (
+        .clk(px_clk),
+        .RGBStr_i( RGBStr0 ),
+        .char_code( char_code )
     );
-    
+
     // STAGE 2
     wire font_bit;
 

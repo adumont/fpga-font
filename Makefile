@@ -6,6 +6,7 @@ endif
 ifeq ($(MODULE), top)
   DEPS:=\
     font.v \
+    tilemem.v \
     ram.v \
     vga_sync.v
 
@@ -20,7 +21,7 @@ ifndef $(MEMORY)
 	MEMORY="1k"
 endif
 
-all: bin svg sim
+all: bin
 
 bin: $(MODULE).bin
 sim: $(MODULE)_tb.vcd
