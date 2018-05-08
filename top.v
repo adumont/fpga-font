@@ -18,7 +18,7 @@ module top (
     // avoid warning if we don't use led
     assign leds = 8'b 0100_0010;
     
-    // Output signals from VGA sync
+    // Output signals from vga_sync0
     wire px_clk;
     wire hsync0, vsync0, activevideo0;
     wire [9:0] px_x0, px_y0;
@@ -41,8 +41,6 @@ module top (
 
     `define Zoom 1
 
-    // wire [`25:0] VGAstr0, VGAstr1;
-
     // STAGE 1
 
     // buffer vga signals for 1 clock cycle 
@@ -53,34 +51,41 @@ module top (
     reg hsync2, vsync2, activevideo2;
     reg hsync3, vsync3, activevideo3;
 
-    reg [25:0] RGBStr0, RGBStr1, RGBStr2, RGBStr3;
+    wire [25:0] RGBStr0;
+    reg  [25:0] RGBStr1, RGBStr2, RGBStr3;
+
+    assign RGBStr0 = { 3'b000, px_x0, px_y0, hsync0, vsync0, activevideo0 };
 
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
-      RGBStr0 <= { 3'b000, px_x0, px_y0, hsync0, vsync0, activevideo0 };
+      
       RGBStr1 <= RGBStr0;
       RGBStr2 <= RGBStr1;
       RGBStr3 <= RGBStr2;
     end
 
+    // ouput wires
     wire [ 7:0] char_code;
+
     tilemem #( .ZOOM( `Zoom ) ) tilemem0 (
-        .clk(px_clk),
-        .RGBStr_i( RGBStr0 ),
-        .char_code( char_code )
+    /*  in */ .clk(px_clk),
+    /*  in */ .RGBStr_i( RGBStr0 ),
+    /* out */ .char_code( char_code )
     );
 
     // STAGE 2
+
+    // ouput wires
     wire font_bit;
 
     font font0 (
-        .px_clk(px_clk),      // Pixel clock.
-        .pos_x( px_x2 >> `Zoom ),       // X screen position.
-        .pos_y( px_y2 >> `Zoom ),       // Y screen position.
-        .character( char_code ),   // Character to stream.
-        .data( font_bit )     // Output RGB stream.
+    /*  in */  .px_clk(px_clk),      // Pixel clock.
+    /*  in */  .pos_x( px_x2 >> `Zoom ),       // X screen position.
+    /*  in */  .pos_y( px_y2 >> `Zoom ),       // Y screen position.
+    /*  in */  .character( char_code ),   // Character to stream.
+    /* out */  .data( font_bit )     // Output RGB stream.
     );
 
     // TODO: Embed in a combination block
@@ -90,7 +95,7 @@ module top (
     always @(*) begin
         rgb <= 3'b000;
         if (activevideo3) begin
-            if ( font_bit && px_y3[9:3] >> `Zoom < 7'd 4 )
+            if ( font_bit )
                 rgb <= 3'b010;
             else if (px_y3 == 0 || px_y3 == 479 || px_x3 == 0 || px_x3 == 639 )
                 rgb <= 3'b001;
