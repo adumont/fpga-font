@@ -6,7 +6,7 @@
         {
             "label": "Synthesize",
             "type": "shell",
-            "command": "apio build",
+            "command": "apio bin",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -16,27 +16,7 @@
         {
             "label": "Upload to FPGA",
             "type": "shell",
-            "command": "apio upload",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Simulate",
-            "type": "shell",
-            "command": "apio sim",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Verify",
-            "type": "shell",
-            "command": "apio verify",
+            "command": "make upload",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -46,7 +26,7 @@
         {
             "label": "Clean",
             "type": "shell",
-            "command": "apio clean",
+            "command": "make clean",
             "group": {
                 "kind": "build",
                 "isDefault": false
