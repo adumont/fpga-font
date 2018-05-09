@@ -14,7 +14,7 @@ module tilemem #(
     assign px_y = RGBStr_i[`YC];
 
     wire [(13-2*ZOOM)-1:0] raddr;
-    assign raddr = { px_y[9:(3+ZOOM)] , px_x[9:(3+ZOOM)] };
+    assign raddr = { px_y[8:(3+ZOOM)] , px_x[9:(3+ZOOM)] }; // y (480) is 1 bit shorter than x (640)
     
     wire [7:0] rdata;
     ram #( .addr_width( 13-2*ZOOM ), .data_width( 8 ) ) ram0 (
