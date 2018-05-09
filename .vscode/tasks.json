@@ -6,7 +6,7 @@
         {
             "label": "Synthesize",
             "type": "shell",
-            "command": "apio bin",
+            "command": "make  bin",
             "group": {
                 "kind": "build",
                 "isDefault": true
