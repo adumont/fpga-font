@@ -23,20 +23,17 @@ module top (
     wire hsync0, vsync0, activevideo0;
     wire [9:0] px_x0, px_y0;
 
-    // Instanciate 'vga_controller' module.
+    // Instanciate 'vga_sync' module.
     vga_sync vga_sync0 (
-        // input:
-        .clk(clk),              // Input clock: 12MHz.
-        
-        // output:
-        .hsync(hsync0),              //  1, Horizontal sync out
-        .vsync(vsync0),              //  1, Vertical sync out
+    /*  in */ .clk(clk),                  // Input clock: 12MHz.
 
-        .x_px(px_x0),                // 10, X position for actual pixel
-        .y_px(px_y0),                // 10, Y position for actual pixel
-        .activevideo(activevideo0),  //  1, Video active
+    /* out */ .hsync(hsync0),             //  1, Horizontal sync out
+    /* out */ .vsync(vsync0),             //  1, Vertical sync out
+    /* out */ .x_px(px_x0),               // 10, X position for actual pixel
+    /* out */ .y_px(px_y0),               // 10, Y position for actual pixel
+    /* out */ .activevideo(activevideo0), //  1, Video active
 
-        .px_clk(px_clk)            // Pixel clock
+    /* out */ .px_clk(px_clk)             // Pixel clock
     );
 
     `define Zoom 1
@@ -66,11 +63,17 @@ module top (
       RGBStr3 <= RGBStr2;
     end
 
+
+
+    /* TODO tilemem0
+        - change addressing scheme to optime for low BRAM resources on the iCE40hx-1k
+    */    
+
     // ouput wires
     wire [ 7:0] char_code;
 
     tilemem #( .ZOOM( `Zoom ) ) tilemem0 (
-    /*  in */ .clk(px_clk),
+    /*  in */ .clk( px_clk ),
     /*  in */ .RGBStr_i( RGBStr0 ),
     /* out */ .char_code( char_code )
     );
@@ -80,17 +83,22 @@ module top (
     // ouput wires
     wire font_bit;
 
+
+    /* TODO font0
+        - coger en input RGBStr2
+        - separar font y meterle un rom.v dentro
+    */    
     font font0 (
-    /*  in */  .px_clk(px_clk),      // Pixel clock.
-    /*  in */  .pos_x( px_x2 >> `Zoom ),       // X screen position.
-    /*  in */  .pos_y( px_y2 >> `Zoom ),       // Y screen position.
-    /*  in */  .character( char_code ),   // Character to stream.
-    /* out */  .data( font_bit )     // Output RGB stream.
+    /*  in */  .px_clk(px_clk),          // Pixel clock.
+    /*  in */  .pos_x( px_x2 >> `Zoom ), // X screen position.
+    /*  in */  .pos_y( px_y2 >> `Zoom ), // Y screen position.
+    /*  in */  .character( char_code ),  // Character at this pixel
+    /* out */  .data( font_bit )         // Output RGB stream.
     );
 
     // TODO: Embed in a combination block
     // takes input: stream 3
-    // TODO: place register at the end to sinc... (stream4)
+    // TODO: place register at the end to sync... (stream4)
 
     always @(*) begin
         rgb <= 3'b000;
