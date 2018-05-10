@@ -36,7 +36,7 @@ module top (
     /* out */ .px_clk(px_clk)             // Pixel clock
     );
 
-    `define Zoom 1
+    `define Zoom 0
 
     // STAGE 1
 
@@ -70,7 +70,7 @@ module top (
     */    
 
     // ouput wires
-    wire [ 7:0] char_code;
+    wire [`FONT_WIDTH-1:0] char_code;
 
     tilemem #( .ZOOM( `Zoom ) ) tilemem0 (
     /*  in */ .clk( px_clk ),

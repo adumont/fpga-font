@@ -9,3 +9,6 @@
 `define B 25        //  1 bit
 `define VGA 22:0    // 23 bits
 `define RGB 25:23   //  3 bits
+
+// Font addr width: ascii 7 bit
+`define FONT_WIDTH 7

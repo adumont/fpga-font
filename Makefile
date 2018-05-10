@@ -12,7 +12,8 @@ ifeq ($(MODULE), top)
 
   AUXFILES:=\
     ram.list\
-    ram65.list
+    ram65.list\
+	const.vh
 
 # YOSYSOPT:=-retime -abc2
 endif
