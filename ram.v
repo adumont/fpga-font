@@ -1,8 +1,9 @@
 `default_nettype none
 
 module ram #(
-        parameter addr_width =  11,
-        parameter data_width =  8
+        parameter data_width =  8,
+        parameter ram_size =  4800,
+        parameter addr_width =  $clog2(ram_size)
     ) (
         input wire rclk,
         input wire [addr_width-1:0] raddr,
@@ -13,7 +14,7 @@ module ram #(
         input wire [data_width-1:0] din
     );
 
-    reg [data_width-1:0] mem [(1<<addr_width)-1:0];
+    reg [data_width-1:0] mem [ram_size-1:0];
 
     parameter ROMFILE = "";
     initial begin

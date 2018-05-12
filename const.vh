@@ -11,4 +11,4 @@
 `define RGB 25:23   //  3 bits
 
 // Font addr width: ascii 7 bit
-`define FONT_WIDTH 7
+`define FONT_WIDTH 8
