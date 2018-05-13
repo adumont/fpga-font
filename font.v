@@ -1,4 +1,5 @@
 `default_nettype none
+`include "const.vh"
 
 module font (
         input wire        px_clk,      // Pixel clock.

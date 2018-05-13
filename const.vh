@@ -1,3 +1,6 @@
+`ifndef __CONST_VH__
+`define __CONST_VH__
+
 // Address alias in VGAstream 
 `define Active 0    //  1 bit
 `define VS 1        //  1 bit
@@ -12,3 +15,5 @@
 
 // Font addr width: ascii 7 bit
 `define FONT_WIDTH 8
+
+`endif // __CONST_VH__
