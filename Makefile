@@ -1,9 +1,18 @@
-# call with make MODULE=moduleName sim|svg|upload
+# Generic Makefile to synthesize, simulate and program an FPGA
+# using opensource toolchain
+# Author: Alexandre Dumont
+
+# TOP:
+# 	make sim|bin|upload
+# Submodules:
+#   make MODULE=moduleName sim|svg
+
+TOP:=top
 
 ifndef $(MODULE)
-	MODULE=top
+	MODULE:=$(TOP)
 endif
-ifeq ($(MODULE), top)
+ifeq ($(MODULE), $(TOP))
   DEPS:=\
     font.v \
     tilemem.v \
