@@ -1,6 +1,18 @@
 `default_nettype none
 `include "const.vh"
 
+// INSTANTIATION TEMPLATE BEGIN
+//
+//     font font0 (
+//     /*  in */  .px_clk(  ),
+//     /*  in */  .pos_x(  ),
+//     /*  in */  .pos_y(  ),
+//     /*  in */  .character(  ),
+//     /* out */  .data(  )
+//     );
+//
+// INSTANTIATION TEMPLATE END
+
 module font (
         input wire        px_clk,      // Pixel clock.
         input wire [9:0]  pos_x,       // X screen position.
