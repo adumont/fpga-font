@@ -14,7 +14,7 @@ module ram #(
         input wire [data_width-1:0] din
     );
 
-    reg [data_width-1:0] mem [ram_size-1:0];
+    reg [data_width-1:0] mem [ram_size-1:0] /* synthesis syn_ramstyle="block_ram" */;
 
     parameter ROMFILE = "";
     initial begin

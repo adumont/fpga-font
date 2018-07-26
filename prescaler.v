@@ -7,7 +7,7 @@
 
 //-- Entrada: señal de reloj de entrada
 //-- Salida: Señal de reloj de salida, con menor frecuencia
-module prescaler(input clk_in, output clk_out);
+module prescaler(input wire clk_in, output wire clk_out);
   wire clk_in;
   wire clk_out;
 

@@ -1,5 +1,5 @@
 //-- init.v  (version optimizada)
-module init(input wire clk, output ini);
+module init(input wire clk, output reg ini);
     //-- Registro de 1 bit inicializa a 0 (solo para simulacion)
     //-- Al sintetizarlo siempre estará a cero con independencia
     //-- del valor al que lo pongamos
