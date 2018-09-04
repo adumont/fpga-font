@@ -18,6 +18,7 @@ AUXFILES_tilemem:=\
 DEPS_TOP:= \
     font.v $(DEPS_font) \
     tilemem.v $(DEPS_tilemem) \
+    divM.v \
     vga_sync.v
 
 AUXFILES_TOP:= \

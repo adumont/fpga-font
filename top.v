@@ -36,7 +36,7 @@ module top (
     /* out */ .px_clk(px_clk)             // Pixel clock
     );
 
-    `define Zoom 0
+    `define Zoom 2
 
     // STAGE 1
 
@@ -63,20 +63,28 @@ module top (
       RGBStr3 <= RGBStr2;
     end
 
-
-
     /* TODO tilemem0
         - change addressing scheme to optime for low BRAM resources on the iCE40hx-1k
     */    
 
     // ouput wires
-    wire [`FONT_WIDTH-1:0] char_code;
+    wire [`FONT_WIDTH-1:0] tilemem0_char_code;
 
     tilemem #( .ZOOM( `Zoom ) ) tilemem0 (
     /*  in */ .clk( px_clk ),
     /*  in */ .RGBStr_i( RGBStr0 ),
-    /* out */ .char_code( char_code )
+    /* out */ .char_code( tilemem0_char_code )
     );
+
+    reg [`FONT_WIDTH-1:0] char_shown;
+
+    always @(*) begin
+        char_shown <= 8'h00;
+        if (activevideo2) begin
+            if ( px_x2 >> (3+`Zoom) == 10 && px_y2 >> (3+`Zoom) == 10  )
+                char_shown <= 8'h30 + counter;
+        end
+    end
 
     // STAGE 2
 
@@ -92,7 +100,7 @@ module top (
     /*  in */  .px_clk(px_clk),          // Pixel clock.
     /*  in */  .pos_x( px_x2 >> `Zoom ), // X screen position.
     /*  in */  .pos_y( px_y2 >> `Zoom ), // Y screen position.
-    /*  in */  .character( char_code ),  // Character at this pixel
+    /*  in */  .character( char_shown ),  // Character at this pixel
     /* out */  .data( font_bit )         // Output RGB stream.
     );
 
@@ -116,4 +124,17 @@ module top (
 
     assign hsync = hsync3;
     assign vsync = vsync3;
+
+
+    // clock divider
+    wire clk_1Hz;
+    divM #( 12_000_000/4 ) div_1Hz(
+        .clk_in(clk),
+        .clk_out(clk_1Hz)
+    );
+
+    reg [2:0] counter = 0;
+    always @( posedge clk_1Hz )
+        counter <= counter + 1;
+
 endmodule
