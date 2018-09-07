@@ -78,12 +78,28 @@ module top (
 
     reg [`FONT_WIDTH-1:0] char_shown;
 
+    wire [7:0] digit_ascii_code;
+    reg  [3:0] hex_digit;
+
+    hex_to_ascii_digit hex_to_ascii_digit0(hex_digit, digit_ascii_code);
+
     always @(*) begin
-        char_shown <= 8'h00;
-        if (activevideo2) begin
-            if ( px_x2 >> (3+`Zoom) == 10 && px_y2 >> (3+`Zoom) == 10  )
-                char_shown <= 8'h30 + counter;
+      char_shown = 8'h00;
+      if (activevideo2) begin
+
+        if ( px_x2 >> (3+`Zoom) == 10 && px_y2 >> (3+`Zoom) ==  8  ) 
+        begin
+          hex_digit = counter[3:0];
+          char_shown = digit_ascii_code;
         end
+
+        else if ( px_x2 >> (3+`Zoom) ==  9 && px_y2 >> (3+`Zoom) ==  8  )
+        begin
+          hex_digit = counter[7:4];
+          char_shown = digit_ascii_code;
+        end
+
+      end
     end
 
     // STAGE 2
@@ -91,11 +107,6 @@ module top (
     // ouput wires
     wire font_bit;
 
-
-    /* TODO font0
-        - coger en input RGBStr2
-        - separar font y meterle un rom.v dentro
-    */    
     font font0 (
     /*  in */  .px_clk(px_clk),          // Pixel clock.
     /*  in */  .pos_x( px_x2 >> `Zoom ), // X screen position.
@@ -127,14 +138,40 @@ module top (
 
 
     // clock divider
-    wire clk_1Hz;
-    divM #( 12_000_000/4 ) div_1Hz(
+    wire clk_counter;
+    divM #( 12_000_000/8 ) div_clk_counter(
         .clk_in(clk),
-        .clk_out(clk_1Hz)
+        .clk_out(clk_counter)
     );
 
-    reg [2:0] counter = 0;
-    always @( posedge clk_1Hz )
+    reg [7:0] counter = 0;
+    always @( posedge clk_counter )
         counter <= counter + 1;
 
+endmodule
+
+module hex_to_ascii_digit(hex_digit, ascii_code);
+    input [3:0] hex_digit;
+    output reg [7:0] ascii_code;
+
+    always @(*)
+        case (hex_digit)
+            4'h0: ascii_code = 8'h30;
+            4'h1: ascii_code = 8'h31;
+            4'h2: ascii_code = 8'h32;
+            4'h3: ascii_code = 8'h33;
+            4'h4: ascii_code = 8'h34;
+            4'h5: ascii_code = 8'h35;
+            4'h6: ascii_code = 8'h36;
+            4'h7: ascii_code = 8'h37;
+            4'h8: ascii_code = 8'h38;
+            4'h9: ascii_code = 8'h39;
+            4'hA: ascii_code = 8'h41;
+            4'hB: ascii_code = 8'h42;
+            4'hC: ascii_code = 8'h43;
+            4'hD: ascii_code = 8'h44;
+            4'hE: ascii_code = 8'h45;
+            4'hF: ascii_code = 8'h46;
+            default: ascii_code = 8'h00;
+        endcase
 endmodule
