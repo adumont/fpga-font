@@ -17,7 +17,6 @@ AUXFILES_tilemem:=\
 
 DEPS_TOP:= \
     font.v $(DEPS_font) \
-    tilemem.v $(DEPS_tilemem) \
     divM.v \
     vga_sync.v
 
@@ -43,7 +42,7 @@ else ifeq ($(MODULE), font)
 
 endif
 
-# YOSYSOPT:=-retime -abc2
+YOSYSOPT:=-retime -abc2
 
 ifndef MEMORY
 	MEMORY="1k"
