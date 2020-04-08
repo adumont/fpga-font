@@ -108,10 +108,10 @@ module vga_sync (
     // Initial values.
     initial
     begin
-      x_px <= 0;
-      y_px <= 0;
-      hc <= 0;
-      vc <= 0;
+      x_px = 0;
+      y_px = 0;
+      hc = 0;
+      vc = 0;
     end
 
     // Counting pixels.
@@ -146,14 +146,14 @@ module vga_sync (
         // First check if we are within vertical active video range.
         if (activevideo)
         begin
-            x_px <= hc - blackH;
-            y_px <= vc - blackV;
+            x_px = hc - blackH;
+            y_px = vc - blackV;
         end
         else
         // We are outside active video range so display black.
         begin
-            x_px <= 0;
-            y_px <= 0;
+            x_px = 0;
+            y_px = 0;
         end
      end
  endmodule
