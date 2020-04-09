@@ -36,7 +36,7 @@ module top (
     /* out */ .px_clk(px_clk)             // Pixel clock
     );
 
-    `define Zoom 1
+    `define Zoom 2
 
     // STAGE 1
 
@@ -47,20 +47,13 @@ module top (
     reg hsync1, vsync1, activevideo1;
     reg hsync2, vsync2, activevideo2;
     reg hsync3, vsync3, activevideo3;
-
-    // wire [25:0] RGBStr0;
-    // reg  [25:0] RGBStr1, RGBStr2, RGBStr3;
-
-    // assign RGBStr0 = { 3'b000, px_x0, px_y0, hsync0, vsync0, activevideo0 };
+    reg activevideo4;
 
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
-      
-      // RGBStr1 <= RGBStr0;
-      // RGBStr2 <= RGBStr1;
-      // RGBStr3 <= RGBStr2;
+      activevideo4 <= activevideo3;
     end
 
     reg [`FONT_WIDTH-1:0] char_shown;
@@ -110,9 +103,11 @@ module top (
         rgb = 3'b000;
         if (activevideo3) begin
             if ( font_bit )
-                rgb = 3'b010;
-            else if (px_y3 == 0 || px_y3 == 479 || px_x3 == 0 || px_x3 == 639 )
+                rgb = counter[2:0] == 3'0 ? 3'b010 : counter[2:0];
+            else if (px_y3 < 5 || px_y3 > 474 || px_x3 < 5 || px_x3 > 634 )
                 rgb = 3'b001;
+//          else if ( px_y2 >> (3+`Zoom) ==  8 )
+//              rgb = 3'b111;
             else
                 rgb = 3'b000;
         end
@@ -126,7 +121,7 @@ module top (
 
     // clock divider
     wire clk_counter;
-    divM #( 12_000_000/8 ) div_clk_counter(
+    divM #( 12_000_000/16 ) div_clk_counter(
         .clk_in(clk),
         .clk_out(clk_counter)
     );

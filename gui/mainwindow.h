@@ -65,9 +65,12 @@ private:
     void LoadProgramFromFile(QString fileName);
 
     QString formatData(CData data);
+    QString formatData(CData data, char n, char base);
     QString verilatorString(WData[]);
 
     void highlightLabel(QWidget*, bool);
+
+    QImage image;
 
 };
 

@@ -4,7 +4,7 @@ RTL_DIR:=..
 RTL_TOP:=top
 GUI_DIR:=.
 
--include $(RTL_DIR)/Design.mk
+include $(RTL_DIR)/Design.mk
 
 RTL_DEPS := $(addprefix $(RTL_DIR)/, $(DEPS))
 
@@ -13,7 +13,7 @@ RTL_DEPS := $(addprefix $(RTL_DIR)/, $(DEPS))
 VLIBS := verilated.o verilated_save.o verilated_vcd_c.o
 VOBJS := $(addprefix $(RTL_DIR)/obj_dir/, $(VLIBS) V$(RTL_TOP)__ALLcls.o V$(RTL_TOP)__ALLsup.o )
 
-verilator: $(VOBJS)
+verilator: $(VOBJS) $(RTL_DEPS)
 
 $(PROJECT): $(PROJECT).mk $(VOBJS) .FORCE
 	cd $(GUI_DIR) && make -f $(PROJECT).mk
