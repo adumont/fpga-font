@@ -103,7 +103,7 @@ module top (
         rgb = 3'b000;
         if (activevideo3) begin
             if ( font_bit )
-                rgb = counter[2:0] == 3'0 ? 3'b010 : counter[2:0];
+                rgb = counter[2:0] == 3'b0 ? 3'b010 : counter[2:0];
             else if (px_y3 < 5 || px_y3 > 474 || px_x3 < 5 || px_x3 > 634 )
                 rgb = 3'b001;
 //          else if ( px_y2 >> (3+`Zoom) ==  8 )
