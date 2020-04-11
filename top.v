@@ -65,6 +65,9 @@ module top (
 
     always @(*) begin
       char_shown = 8'h00;
+      hex_digit = 4'b 0;
+      char_shown = 8'b 0;
+
       if (activevideo2) begin
 
         if ( px_x2 >> (3+`Zoom) == 10 && px_y2 >> (3+`Zoom) ==  8  ) 
@@ -137,6 +140,8 @@ module hex_to_ascii_digit(hex_digit, ascii_code);
     output reg [7:0] ascii_code;
 
     always @(*)
+    begin
+        ascii_code = 8'h00;
         case (hex_digit)
             4'h0: ascii_code = 8'h30;
             4'h1: ascii_code = 8'h31;
@@ -156,4 +161,5 @@ module hex_to_ascii_digit(hex_digit, ascii_code);
             4'hF: ascii_code = 8'h46;
             default: ascii_code = 8'h00;
         endcase
+    end
 endmodule
