@@ -486,8 +486,8 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>640</width>
-      <height>480</height>
+      <width>642</width>
+      <height>482</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -638,13 +638,6 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <zorder>screen</zorder>
-    <zorder>led_activevideo</zorder>
-    <zorder>label_6</zorder>
-    <zorder>px_x</zorder>
-    <zorder>px_y</zorder>
-    <zorder>vc</zorder>
-    <zorder>hc</zorder>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -695,7 +688,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Generate Trace</string>
+    <string>&amp;Generate Trace</string>
    </property>
   </action>
  </widget>
