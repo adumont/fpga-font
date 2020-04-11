@@ -1,20 +1,43 @@
 # call with make MODULE=moduleName sim|svg|upload
 
+include Boards.mk
+BOARD_BUILDDIR:=builddir/$(BOARD)
+BUILDDIR:=$(BOARD_BUILDDIR)
+
 include Design.mk
 
-BUILDDIR?=builddir/
+# Use Docker images
+DOCKER=docker
+#DOCKER=podman
+#
+PWD = $(shell pwd)
+DOCKERARGS = run --rm -v $(PWD):/src -w /src
+#
+# DOCKER_YOSYS="adumont/yosys:master"
+ifneq ($(DOCKER_YOSYS),)
+YOSYS     = $(DOCKER) $(DOCKERARGS) $(DOCKER_YOSYS)
+else
+YOSYS=yosys
+endif
+
+NEXTPNR   = $(DOCKER) $(DOCKERARGS) ghdl/synth:nextpnr-ice40 nextpnr-ice40
+
+BUILDDIR?=builddir/$(BOARD)
+ARACHNE_SEED?=36747270
 
 all: bin svg dot sim
 
-bin: $(BUILDDIR)$(MODULE).bin
+bin: $(BUILDDIR)/$(MODULE).bin
 vcd: $(MODULE)_tb.vcd
 sim: vcd gtkwave
-json: $(BUILDDIR)$(MODULE).json
+json: $(BUILDDIR)/$(MODULE)-netlist.json
 svg: assets/$(MODULE).svg
 dot: assets/$(MODULE)_dot.svg
+lint: $(BOARD_BUILDDIR)/$(MODULE).lint
 
 # @echo '@: $@' # file name of the target
-# @echo '%: $%' # name of the archive member
+# @echo '%: $%' # name of the archive member-$(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).blif
+
 # @echo '<: $<' # name of the first prerequisite
 # @echo '?: $?' # names of all prerequisites newer than the target
 # @echo '^: $^' # names of all prerequisites
@@ -22,61 +45,100 @@ dot: assets/$(MODULE)_dot.svg
 # @echo '*: $*' # stem with which an implicit rule matches
 # @echo $(word 2, $?) 2nd word names of all prerequisites 
 
-$(MODULE)_tb.vcd: $(MODULE).v $(DEPS) $(MODULE)_tb.v
+PCF:=$(MODULE)-$(BOARD).pcf
 
-	iverilog $^ $(IVERILOG_MACRO) -o $(MODULE)_tb.out
+ifeq ($(PROGRAM),test/$(LEVEL)/program)
+CLEAN_PROGRAM:=$(PROGRAM)
+
+$(PROGRAM): test/$(LEVEL)/PROG
+	make -C test/$(LEVEL) -f ../tester.mk program
+endif
+
+$(MODULE)_tb.vcd: $(MODULE).v $(DEPS) $(MODULE)_tb.v $(PROGRAM) $(ROMFILE)
+
+	iverilog $(MODULE).v $(DEPS) $(MODULE)_tb.v $(IVERILOG_MACRO) -o $(MODULE)_tb.out
 	./$(MODULE)_tb.out
+
+$(BOARD_BUILDDIR)/$(MODULE).lint: $(MODULE).v $(DEPS) $(BUILDDIR)
+
+	verilator --lint-only $(MODULE).v && > $@ || ( rm -f $@; false )
 
 gtkwave: $(MODULE).v $(DEPS) $(MODULE)_tb.v $(MODULE)_tb.vcd
 
 	gtkwave $(MODULE)_tb.vcd $(MODULE)_tb.gtkw &
 
-$(BUILDDIR)$(MODULE).bin: $(MODULE).pcf $(MODULE).v $(DEPS) $(AUXFILES) $(BUILDDIR)build.config
+$(BOARD_BUILDDIR)/$(MODULE).json: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config
 	
-	yosys -p "synth_ice40 -top $(MODULE) -blif $(BUILDDIR)$(MODULE).blif $(YOSYSOPT)" \
-              -l $(BUILDDIR)$(MODULE).log -q $(DEPS) $(MODULE).v
+	$(YOSYS) -p "synth_ice40 -top $(MODULE) -json $(BOARD_BUILDDIR)/$(MODULE).json $(YOSYSOPT)" \
+              -l $(BUILDDIR)/$(MODULE).log -q $(DEPS) $(MODULE).v
+
+$(BOARD_BUILDDIR)/$(MODULE).blif: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config
 	
-	arachne-pnr -d $(MEMORY) -p $(MODULE).pcf $(BUILDDIR)$(MODULE).blif -o $(BUILDDIR)$(MODULE).pnr
-	
-	icepack $(BUILDDIR)$(MODULE).pnr $(BUILDDIR)$(MODULE).bin
+	$(YOSYS) -p "synth_ice40 -top $(MODULE) -blif $(BOARD_BUILDDIR)/$(MODULE).blif $(YOSYSOPT)" \
+              -l $(BUILDDIR)/$(MODULE).log -q $(DEPS) $(MODULE).v
 
-$(BUILDDIR)$(MODULE).json: $(MODULE).v $(DEPS)
+# set ARACHNEPNR=1 to force arachne-pnr
+ifneq ($(ARACHNEPNR),)
+$(warning Building with arachne-pnr, because ARACHNEPNR=$(ARACHNEPNR))
+$(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).blif
 
-	yosys -p "prep -top $(MODULE); write_json $(MODULE).json" $(MODULE).v $(DEPS)
+	arachne-pnr -s $(ARACHNE_SEED) -d $(PNRDEV) -p $(PCF) $(BOARD_BUILDDIR)/$(MODULE).blif -o $(BOARD_BUILDDIR)/$(MODULE).pnr
 
-assets/$(MODULE).svg: $(BUILDDIR)$(MODULE).json
+else
+$(warning Building with nextpnr, because ARACHNEPNR=$(ARACHNEPNR))
+$(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).json
 
-	netlistsvg $(MODULE).json -o assets/$(MODULE).svg && rm $(MODULE).json
+	$(NEXTPNR) --hx$(PNRDEV) --package $(PNRPACK) --json $(BOARD_BUILDDIR)/$(MODULE).json --pcf $(PCF) --asc $@
+endif
+
+
+ifdef LEVEL
+$( warning LEVEL=$(LEVEL))
+$(BUILDDIR)/$(MODULE).pnr: $(BOARD_BUILDDIR)/$(MODULE).pnr $(PROGRAM) $(ROMFILE)
+
+	icebram dummy_prg.hex $(PROGRAM) < $(BOARD_BUILDDIR)/$(MODULE).pnr > $(BUILDDIR)/$(MODULE)-tmp.pnr && \
+	icebram dummy_ram.hex $(ROMFILE) < $(BUILDDIR)/$(MODULE)-tmp.pnr > $(BUILDDIR)/$(MODULE).pnr && \
+	rm $(BUILDDIR)/$(MODULE)-tmp.pnr
+endif
+
+$(BUILDDIR)/$(MODULE).bin: $(BOARD_BUILDDIR)/$(MODULE).lint $(BUILDDIR)/$(MODULE).pnr
+
+	icepack $(BUILDDIR)/$(MODULE).pnr $(BUILDDIR)/$(MODULE).bin
+
+upload: $(BUILDDIR)/$(MODULE).bin
+
+	md5sum $(BUILDDIR)/$(MODULE).bin | cmp $(BOARD_BUILDDIR)/flashed.md5 && \
+	( echo "INFO: FPGA $(BOARD) bitstream hasn't changed: Skipping programming and reseting board:" ; iceprog -t ) || \
+	( iceprog $(BUILDDIR)/$(MODULE).bin && md5sum $(BUILDDIR)/$(MODULE).bin > $(BOARD_BUILDDIR)/flashed.md5 || rm $(BOARD_BUILDDIR)/flashed.md5 )
+
+$(BUILDDIR)/$(MODULE)-netlist.json: $(MODULE).v $(DEPS)
+
+	yosys -p "prep -top $(MODULE); write_json $(MODULE)-netlist.json" $(MODULE).v $(DEPS)
+
+assets/$(MODULE).svg: $(BUILDDIR)/$(MODULE)-netlist.json
+
+	netlistsvg $(BUILDDIR)/$(MODULE)-netlist.json -o assets/$(MODULE).svg && rm $(MODULE).json
 
 assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 
-	yosys -p "read_verilog $(MODULE).v $(DEPS); hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
+	$(YOSYS) -p "read_verilog $(MODULE).v $(DEPS); hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
-upload: $(BUILDDIR)$(MODULE).bin
-	iceprog $(BUILDDIR)$(MODULE).bin
-
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
-$(BUILDDIR)build.config: $(AUXFILES) $(BUILDDIR) .force
+$(BOARD_BUILDDIR)/build.config: $(AUXFILES) $(BUILDDIR) .force
 	@echo '$(AUXFILES)' | cmp -s - $@ || echo '$(AUXFILES)' > $@
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
-$(BUILDDIR)top_wrapper.v: top_wrapper.m4 $(BUILDDIR)build.config
-	m4 $(M4_OPTIONS) top_wrapper.m4 > $(BUILDDIR)top_wrapper.v
+$(BOARD_BUILDDIR)/top_wrapper.v: top_wrapper.m4 $(BOARD_BUILDDIR)/build.config
+	m4 $(M4_OPTIONS) top_wrapper.m4 > $(BOARD_BUILDDIR)/top_wrapper.v
+
+test:
+	$(MAKE) -C test all
 
 clean:
+	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM)
 
-	rm -f $(BUILDDIR)$(MODULE).bin
-	rm -f $(BUILDDIR)$(MODULE).pnr
-	rm -f $(BUILDDIR)$(MODULE).blif
-	rm -f $(BUILDDIR)top_wrapper.v
-	rm -f $(BUILDDIR)$(MODULE).log
-	rm -f $(BUILDDIR)build.config
-	rmdir $(BUILDDIR) 2>/dev/null || true
-	rm -f *.out *.vcd
-
-.PHONY: all clean json svg bin sim dot .force
- 
+.PHONY: all clean json vcd svg bin sim dot .force test upload lint
