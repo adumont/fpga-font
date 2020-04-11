@@ -85,7 +85,7 @@ module top (
           hex_digit = counter[3:0];
           char_shown = digit_ascii_code;
           zoom = `ZoomCounter;
-          color2 = 3'b 110;
+          color2 = `GREEN;
         end
 
         else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
@@ -93,14 +93,14 @@ module top (
           hex_digit = counter[7:4];
           char_shown = digit_ascii_code;
           zoom = `ZoomCounter;
-          color2 = 3'b 101;
+          color2 = `GREEN;
         end
 
         else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  1  )
         begin
           char_shown = char_texto;
           zoom = `ZoomTexto;
-          color2 = 3'b 100;
+          color2 = `WHITE;
         end
 
       end
