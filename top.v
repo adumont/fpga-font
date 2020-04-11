@@ -25,18 +25,20 @@ module top (
 
     // Instanciate 'vga_sync' module.
     vga_sync vga_sync0 (
-    /*  in */ .clk(clk),                  // Input clock: 12MHz.
+       .clk(clk),                  // Input clock: 12MHz.
 
-    /* out */ .hsync(hsync0),             //  1, Horizontal sync out
-    /* out */ .vsync(vsync0),             //  1, Vertical sync out
-    /* out */ .x_px(px_x0),               // 10, X position for actual pixel
-    /* out */ .y_px(px_y0),               // 10, Y position for actual pixel
-    /* out */ .activevideo(activevideo0), //  1, Video active
+       .hsync(hsync0),             //  1, Horizontal sync out
+       .vsync(vsync0),             //  1, Vertical sync out
 
-    /* out */ .px_clk(px_clk)             // Pixel clock
+       .x_px(px_x0),               // 10, X position for actual pixel
+       .y_px(px_y0),               // 10, Y position for actual pixel
+       .activevideo(activevideo0), //  1, Video active
+
+       .px_clk(px_clk)             // Pixel clock
     );
 
-    `define Zoom 2
+    `define ZoomCounter 2
+    `define ZoomTexto 0
 
     // STAGE 1
 
@@ -48,12 +50,14 @@ module top (
     reg hsync2, vsync2, activevideo2;
     reg hsync3, vsync3, activevideo3;
     reg activevideo4;
+    reg [2:0] color2, color3;
 
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
       activevideo4 <= activevideo3;
+      color3 <= color2;
     end
 
     reg [`FONT_WIDTH-1:0] char_shown;
@@ -63,6 +67,12 @@ module top (
 
     hex_to_ascii_digit hex_to_ascii_digit0(hex_digit, digit_ascii_code);
 
+    wire [7:0] char_texto;
+    wire [9:0] texto_index_tmp = px_x2 >> 3 ;
+    texto texto0( texto_index_tmp[3:0] , char_texto);
+
+    reg [1:0] zoom;
+
     always @(*) begin
       char_shown = 8'h00;
       hex_digit = 4'b 0;
@@ -70,16 +80,27 @@ module top (
 
       if (activevideo2) begin
 
-        if ( px_x2 >> (3+`Zoom) == 10 && px_y2 >> (3+`Zoom) ==  8  ) 
+        if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
         begin
           hex_digit = counter[3:0];
           char_shown = digit_ascii_code;
+          zoom = `ZoomCounter;
+          color2 = 3'b 110;
         end
 
-        else if ( px_x2 >> (3+`Zoom) ==  9 && px_y2 >> (3+`Zoom) ==  8  )
+        else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
         begin
           hex_digit = counter[7:4];
           char_shown = digit_ascii_code;
+          zoom = `ZoomCounter;
+          color2 = 3'b 101;
+        end
+
+        else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  1  )
+        begin
+          char_shown = char_texto;
+          zoom = `ZoomTexto;
+          color2 = 3'b 100;
         end
 
       end
@@ -91,11 +112,12 @@ module top (
     wire font_bit;
 
     font font0 (
-    /*  in */  .px_clk(px_clk),          // Pixel clock.
-    /*  in */  .pos_x( px_x2 >> `Zoom ), // X screen position.
-    /*  in */  .pos_y( px_y2 >> `Zoom ), // Y screen position.
-    /*  in */  .character( char_shown ),  // Character at this pixel
-    /* out */  .data( font_bit )         // Output RGB stream.
+       .px_clk(px_clk),          // Pixel clock.
+       .pos_x( px_x2 >> zoom ), // X screen position.
+       .pos_y( px_y2 >> zoom ), // Y screen position.
+       .character( char_shown ),  // Character at this pixel
+       // output
+       .data( font_bit )         // Output RGB stream.
     );
 
     // TODO: Embed in a combbin_to_ascii2ck
@@ -106,11 +128,12 @@ module top (
         rgb = 3'b000;
         if (activevideo3) begin
             if ( font_bit )
-                rgb = counter[2:0] == 3'b0 ? 3'b010 : counter[2:0];
+                rgb = color3;
+
+            // Draw a border
             else if (px_y3 < 5 || px_y3 > 474 || px_x3 < 5 || px_x3 > 634 )
                 rgb = 3'b001;
-//          else if ( px_y2 >> (3+`Zoom) ==  8 )
-//              rgb = 3'b111;
+
             else
                 rgb = 3'b000;
         end
@@ -121,17 +144,23 @@ module top (
     assign hsync = hsync3;
     assign vsync = vsync3;
 
+    wire endframe;
+    assign endframe = ( px_x3 == 639 ) && ( px_y3 == 479 );
 
-    // clock divider
-    wire clk_counter;
-    divM #( 12_000_000/16 ) div_clk_counter(
-        .clk_in(clk),
-        .clk_out(clk_counter)
-    );
+    // Register test.
+    reg [7:0] framecounter = 8'h 00;  // Frame counter
+    reg [7:0] counter = 8'h 00;   // Counter to show.
 
-    reg [7:0] counter = 0;
-    always @( posedge clk_counter )
+    // Register temporal test.
+    always @(posedge endframe)
+    begin
+        framecounter <= framecounter + 1;
+    end
+
+    always @(posedge framecounter[2])
+    begin
         counter <= counter + 1;
+    end
 
 endmodule
 

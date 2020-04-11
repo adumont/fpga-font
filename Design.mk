@@ -17,7 +17,7 @@ AUXFILES_tilemem:=\
 
 DEPS_TOP:= \
     font.v $(DEPS_font) \
-    divM.v \
+    texto.v \
     vga_sync.v
 
 AUXFILES_TOP:= \
