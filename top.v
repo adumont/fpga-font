@@ -38,7 +38,7 @@ module top (
     );
 
     `define ZoomCounter 2
-    `define ZoomTexto 0
+    `define ZoomTexto   1
 
     // STAGE 1
 
@@ -49,14 +49,14 @@ module top (
     reg hsync1, vsync1, activevideo1;
     reg hsync2, vsync2, activevideo2;
     reg hsync3, vsync3, activevideo3;
-    reg activevideo4;
     reg [2:0] color2, color3;
+
+    reg [9:0] font_x2, font_y2;
 
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
       { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
-      activevideo4 <= activevideo3;
       color3 <= color2;
     end
 
@@ -68,23 +68,23 @@ module top (
     hex_to_ascii_digit hex_to_ascii_digit0(hex_digit, digit_ascii_code);
 
     wire [7:0] char_texto;
-    wire [9:0] texto_index_tmp = px_x2 >> 3 ;
-    texto texto0( texto_index_tmp[3:0] , char_texto);
+    wire [9:0] texto_index_tmp = px_x2 >> (3+`ZoomTexto) ;
 
-    reg [1:0] zoom;
+    texto texto0( texto_index_tmp[3:0] , char_texto);
 
     always @(*) begin
       char_shown = 8'h00;
       hex_digit = 4'b 0;
       char_shown = 8'b 0;
 
-      if (activevideo2) begin
+      //if (activevideo2) begin
 
         if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
         begin
           hex_digit = counter[3:0];
           char_shown = digit_ascii_code;
-          zoom = `ZoomCounter;
+          font_x2 = px_x2 >> `ZoomCounter;
+          font_y2 = px_y2 >> `ZoomCounter;
           color2 = `GREEN;
         end
 
@@ -92,18 +92,20 @@ module top (
         begin
           hex_digit = counter[7:4];
           char_shown = digit_ascii_code;
-          zoom = `ZoomCounter;
+          font_x2 = px_x2 >> `ZoomCounter;
+          font_y2 = px_y2 >> `ZoomCounter;
           color2 = `GREEN;
         end
 
-        else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  1  )
+        else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  0  )
         begin
           char_shown = char_texto;
-          zoom = `ZoomTexto;
+          font_x2 = px_x2 >> `ZoomTexto;
+          font_y2 = px_y2 >> `ZoomTexto;
           color2 = `WHITE;
         end
 
-      end
+      //end
     end
 
     // STAGE 2
@@ -113,8 +115,8 @@ module top (
 
     font font0 (
        .px_clk(px_clk),          // Pixel clock.
-       .pos_x( px_x2 >> zoom ), // X screen position.
-       .pos_y( px_y2 >> zoom ), // Y screen position.
+       .pos_x( font_x2 ), // X screen position.
+       .pos_y( font_y2 ), // Y screen position.
        .character( char_shown ),  // Character at this pixel
        // output
        .data( font_bit )         // Output RGB stream.
@@ -125,20 +127,21 @@ module top (
     // TODO: place register at the end to sync... (stream4)
 
     always @(*) begin
-        rgb = 3'b000;
-        if (activevideo3) begin
+        rgb = `BLACK;
+        if (activevideo3)
+        begin
             if ( font_bit )
                 rgb = color3;
 
             // Draw a border
-            else if (px_y3 < 5 || px_y3 > 474 || px_x3 < 5 || px_x3 > 634 )
-                rgb = 3'b001;
+            else if (px_y3 == 0 || px_y3 == 479 || px_x3 == 0 || px_x3 == 639 )
+                rgb = `GREEN;
 
             else
-                rgb = 3'b000;
+                rgb = `BLACK;
         end
         else
-            rgb = 3'b000;
+            rgb = `BLACK;
     end
 
     assign hsync = hsync3;
