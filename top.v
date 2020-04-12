@@ -72,6 +72,7 @@ module top (
     wire [7:0] i_vgaLabel1_din;
     wire [7:0] o_vgaLabel1_dout;
     wire [2:0] o_vgaLabel1_color;
+    wire [1:0] o_vgaLabel1_zoom;
     wire       o_vgaLabel1_n2d;
 
     vgaModule vgaLabel1 (
@@ -81,21 +82,20 @@ module top (
       .y     (i_vgaLabel1_y     ),
       .din   (i_vgaLabel1_din   ),
       //---- output ports ----
-      .id    (o_vgaLabel1_id    ),
       .addr  (o_vgaLabel1_addr  ),
       .dout  (o_vgaLabel1_dout  ),
       .color (o_vgaLabel1_color ),
+      .zoom  (o_vgaLabel1_zoom  ),
       .n2d   (o_vgaLabel1_n2d   )
     );
     // Define Parameters:
     defparam vgaLabel1.line   = 10;
     defparam vgaLabel1.col    = 20;
-    defparam vgaLabel1.zoom   = 0;
-    defparam vgaLabel1.ccolor = `TEAL;
+    defparam vgaLabel1.pzoom   = 0;
+    defparam vgaLabel1.pcolor = `TEAL;
     defparam vgaLabel1.width  = 8;
     defparam vgaLabel1.height = 1;
     defparam vgaLabel1.offset = 0;
-    defparam vgaLabel1.cid    = 1;
     // Connect Inputs:
     assign i_vgaLabel1_px_clk = px_clk ;
     assign i_vgaLabel1_x      = px_x1 ;
@@ -114,6 +114,7 @@ module top (
     wire [7:0] i_vgaLabel2_din;
     wire [7:0] o_vgaLabel2_dout;
     wire [2:0] o_vgaLabel2_color;
+    wire [1:0] o_vgaLabel2_zoom;
     wire       o_vgaLabel2_n2d;
 
     vgaModule vgaLabel2 (
@@ -123,21 +124,20 @@ module top (
       .y     (i_vgaLabel2_y     ),
       .din   (i_vgaLabel2_din   ),
       //---- output ports ----
-      .id    (o_vgaLabel2_id    ),
       .addr  (o_vgaLabel2_addr  ),
       .dout  (o_vgaLabel2_dout  ),
       .color (o_vgaLabel2_color ),
+      .zoom  (o_vgaLabel2_zoom  ),
       .n2d   (o_vgaLabel2_n2d   )
     );
     // Define Parameters:
     defparam vgaLabel2.line   = 12;
     defparam vgaLabel2.col    = 5;
-    defparam vgaLabel2.zoom   = 0;
-    defparam vgaLabel2.ccolor = `RED;
-    defparam vgaLabel2.width  = 15;
+    defparam vgaLabel2.pzoom   = 0;
+    defparam vgaLabel2.pcolor = `RED;
+    defparam vgaLabel2.width  = 14;
     defparam vgaLabel2.height = 1;
     defparam vgaLabel2.offset = 8;
-    defparam vgaLabel2.cid    = 2;
     // Connect Inputs:
     assign i_vgaLabel2_px_clk = px_clk ;
     assign i_vgaLabel2_x      = px_x1 ;
@@ -156,6 +156,7 @@ module top (
     wire [7:0] i_vgaLabel3_din;
     wire [7:0] o_vgaLabel3_dout;
     wire [2:0] o_vgaLabel3_color;
+    wire [1:0] o_vgaLabel3_zoom;
     wire       o_vgaLabel3_n2d;
 
     vgaModule vgaLabel3 (
@@ -165,21 +166,20 @@ module top (
       .y     (i_vgaLabel3_y     ),
       .din   (i_vgaLabel3_din   ),
       //---- output ports ----
-      .id    (o_vgaLabel3_id    ),
       .addr  (o_vgaLabel3_addr  ),
       .dout  (o_vgaLabel3_dout  ),
       .color (o_vgaLabel3_color ),
+      .zoom  (o_vgaLabel3_zoom  ),
       .n2d   (o_vgaLabel3_n2d   )
     );
     // Define Parameters:
     defparam vgaLabel3.line   = 2;
     defparam vgaLabel3.col    = 2;
-    defparam vgaLabel3.zoom   = 1;
-    defparam vgaLabel3.ccolor = `YELLOW;
+    defparam vgaLabel3.pzoom   = 1;
+    defparam vgaLabel3.pcolor = `YELLOW;
     defparam vgaLabel3.width  = 6;
     defparam vgaLabel3.height = 1;
-    defparam vgaLabel3.offset = 23;
-    defparam vgaLabel3.cid    = 3;
+    defparam vgaLabel3.offset = 22;
     // Connect Inputs:
     assign i_vgaLabel3_px_clk = px_clk ;
     assign i_vgaLabel3_x      = px_x1 ;
@@ -233,8 +233,9 @@ module top (
     always @(*) begin
       char_shown = 8'h00 | o_vgaLabel1_dout  | o_vgaLabel2_dout  | o_vgaLabel3_dout ; // * Add all vgaBlocks here (bitwise OR)
       color2 = `BLACK    | o_vgaLabel1_color | o_vgaLabel2_color | o_vgaLabel3_color; // * Add all vgaBlocks here (bitwise OR)
+      zoom = 0 | o_vgaLabel1_zoom | o_vgaLabel2_zoom | o_vgaLabel3_zoom;
+
       hex_digit = 4'b 0;
-      zoom = 0;
 
       // TODO move to it's own vgaModule block
       if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
