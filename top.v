@@ -37,6 +37,7 @@ module top (
        .px_clk(px_clk)             // Pixel clock
     );
 
+    reg [1:0] zoom;
     `define ZoomCounter 2
     `define ZoomTexto   1
 
@@ -51,8 +52,6 @@ module top (
     reg hsync3, vsync3, activevideo3;
     reg [2:0] color2, color3;
 
-    reg [9:0] font_x2, font_y2;
-
     always @( posedge px_clk) begin
       { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
       { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
@@ -65,7 +64,7 @@ module top (
     wire [7:0] digit_ascii_code;
     reg  [3:0] hex_digit;
 
-    hex_to_ascii_digit hex_to_ascii_digit0(hex_digit, digit_ascii_code);
+    nibble2digit nibble2digit0(hex_digit, digit_ascii_code);
 
     wire [7:0] char_texto;
     wire [9:0] texto_index_tmp = px_x2 >> (3+`ZoomTexto) ;
@@ -76,36 +75,31 @@ module top (
       char_shown = 8'h00;
       hex_digit = 4'b 0;
       char_shown = 8'b 0;
+      color2 = `BLACK;
 
-      //if (activevideo2) begin
+      if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
+      begin
+        hex_digit = counter[3:0];
+        char_shown = digit_ascii_code;
+        zoom = `ZoomCounter;
+        color2 = `GREEN;
+      end
 
-        if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
-        begin
-          hex_digit = counter[3:0];
-          char_shown = digit_ascii_code;
-          font_x2 = px_x2 >> `ZoomCounter;
-          font_y2 = px_y2 >> `ZoomCounter;
-          color2 = `GREEN;
-        end
+      else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
+      begin
+        hex_digit = counter[7:4];
+        char_shown = digit_ascii_code;
+        zoom = `ZoomCounter;
+        color2 = `GREEN;
+      end
 
-        else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
-        begin
-          hex_digit = counter[7:4];
-          char_shown = digit_ascii_code;
-          font_x2 = px_x2 >> `ZoomCounter;
-          font_y2 = px_y2 >> `ZoomCounter;
-          color2 = `GREEN;
-        end
+      else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  0  )
+      begin
+        char_shown = char_texto;
+        zoom = `ZoomTexto;
+        color2 = `WHITE;
+      end
 
-        else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  0  )
-        begin
-          char_shown = char_texto;
-          font_x2 = px_x2 >> `ZoomTexto;
-          font_y2 = px_y2 >> `ZoomTexto;
-          color2 = `WHITE;
-        end
-
-      //end
     end
 
     // STAGE 2
@@ -115,8 +109,8 @@ module top (
 
     font font0 (
        .px_clk(px_clk),          // Pixel clock.
-       .pos_x( font_x2 ), // X screen position.
-       .pos_y( font_y2 ), // Y screen position.
+       .pos_x( px_x2 >> zoom ), // X screen position.
+       .pos_y( px_y2 >> zoom ), // Y screen position.
        .character( char_shown ),  // Character at this pixel
        // output
        .data( font_bit )         // Output RGB stream.
@@ -167,31 +161,3 @@ module top (
 
 endmodule
 
-module hex_to_ascii_digit(hex_digit, ascii_code);
-    input [3:0] hex_digit;
-    output reg [7:0] ascii_code;
-
-    always @(*)
-    begin
-        ascii_code = 8'h00;
-        case (hex_digit)
-            4'h0: ascii_code = 8'h30;
-            4'h1: ascii_code = 8'h31;
-            4'h2: ascii_code = 8'h32;
-            4'h3: ascii_code = 8'h33;
-            4'h4: ascii_code = 8'h34;
-            4'h5: ascii_code = 8'h35;
-            4'h6: ascii_code = 8'h36;
-            4'h7: ascii_code = 8'h37;
-            4'h8: ascii_code = 8'h38;
-            4'h9: ascii_code = 8'h39;
-            4'hA: ascii_code = 8'h41;
-            4'hB: ascii_code = 8'h42;
-            4'hC: ascii_code = 8'h43;
-            4'hD: ascii_code = 8'h44;
-            4'hE: ascii_code = 8'h45;
-            4'hF: ascii_code = 8'h46;
-            default: ascii_code = 8'h00;
-        endcase
-    end
-endmodule

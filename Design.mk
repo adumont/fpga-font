@@ -17,6 +17,7 @@ AUXFILES_tilemem:=\
 
 DEPS_TOP:= \
     font.v $(DEPS_font) \
+    nibble2digit.v \
     texto.v \
     vga_sync.v
 
