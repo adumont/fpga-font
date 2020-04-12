@@ -19,11 +19,14 @@ DEPS_TOP:= \
     font.v $(DEPS_font) \
     nibble2digit.v \
     texto.v \
+    ram.v \
+    vgaModule.v \
     vga_sync.v
 
 AUXFILES_TOP:= \
     $(AUXFILES_font) \
     $(AUXFILES_tilemem) \
+    Labels.lst \
   	const.vh
 
 ifeq ($(MODULE), $(TOP))
