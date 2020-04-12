@@ -212,7 +212,7 @@ module top (
     defparam labelsRam.ROMFILE = "Labels.lst";
     // Connect Inputs:
     assign i_labelsRam_clk      = px_clk ;
-    assign i_labelsRam_addr     = o_vgaLabel1_addr | o_vgaLabel2_addr | o_vgaLabel3_addr ;; // we OR' all addresses. Only 1 should be valid, all others are 00.
+    assign i_labelsRam_addr     = o_vgaLabel1_addr | o_vgaLabel2_addr | o_vgaLabel3_addr ; // we OR' all addresses. Only 1 should be valid, all others are 00.
     // we don't use write port here...
     assign i_labelsRam_write_en = 1'b 0 ;
     assign i_labelsRam_din      = 8'b 0 ;
