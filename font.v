@@ -9,7 +9,7 @@ module font (
         output wire       data
     );
 
-    parameter FILE_FONT = "romfont.hex";
+    parameter FILE_FONT = "font_rom.hex";
 
     wire [(`FONT_WIDTH-1)+3:0] row;
     wire [2:0] col;
