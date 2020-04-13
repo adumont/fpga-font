@@ -14,7 +14,7 @@ module font_tb();
         .px_clk(clk),
         .pos_x(px_x),       // X screen position.
         .pos_y(px_y),       // Y screen position.
-        .character( 8'h 37 ),   // Character to stream.
+        .character( 8'h 41 ),   // Character to stream.
         .data(data)     // Output RGB stream.
     );
 

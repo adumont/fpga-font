@@ -1,3 +1,6 @@
+`ifndef __RAM_V__
+`define __RAM_V__
+
 `default_nettype none
 
 // ** Single-Port RAM **
@@ -29,3 +32,5 @@ module ram #(
     dout = mem[addr];
   end
 endmodule
+
+`endif // __RAM_V__

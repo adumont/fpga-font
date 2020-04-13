@@ -2,7 +2,8 @@ TOP:=top
 
 MODULE?=$(TOP)
 
-DEPS_font:=
+DEPS_font:=\
+    ram.v
 
 AUXFILES_font:=\
     BRAM_8.list
