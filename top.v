@@ -96,7 +96,7 @@ module top (
     defparam vgaLabel1.pcolor = `TEAL;
     defparam vgaLabel1.width  = 8;
     defparam vgaLabel1.height = 1;
-    defparam vgaLabel1.offset = 0;
+    defparam vgaLabel1.offset = 60;
     // Connect Inputs:
     assign i_vgaLabel1_px_clk = px_clk ;
     assign i_vgaLabel1_x      = px_x0 ;
@@ -138,9 +138,9 @@ module top (
     defparam vgaLabel2.col    = 5;
     defparam vgaLabel2.pzoom   = 0;
     defparam vgaLabel2.pcolor = `RED;
-    defparam vgaLabel2.width  = 14;
+    defparam vgaLabel2.width  = 25;
     defparam vgaLabel2.height = 1;
-    defparam vgaLabel2.offset = 8;
+    defparam vgaLabel2.offset = 28;
     // Connect Inputs:
     assign i_vgaLabel2_px_clk = px_clk ;
     assign i_vgaLabel2_x      = px_x0 ;
