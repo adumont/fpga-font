@@ -67,7 +67,7 @@ module top (
     wire       i_vgaLabel1_px_clk;
     wire [9:0] i_vgaLabel1_x;
     wire [9:0] i_vgaLabel1_y;
-    wire [7:0] o_vgaLabel1_id;
+    wire       i_vgaLabel1_en;
     wire [7:0] o_vgaLabel1_addr;
     wire [7:0] i_vgaLabel1_din;
     wire [7:0] o_vgaLabel1_dout;
@@ -80,6 +80,7 @@ module top (
       .px_clk(i_vgaLabel1_px_clk),
       .x     (i_vgaLabel1_x     ),
       .y     (i_vgaLabel1_y     ),
+      .en    (i_vgaLabel1_en    ),
       .din   (i_vgaLabel1_din   ),
       //---- output ports ----
       .addr  (o_vgaLabel1_addr  ),
@@ -98,8 +99,9 @@ module top (
     defparam vgaLabel1.offset = 0;
     // Connect Inputs:
     assign i_vgaLabel1_px_clk = px_clk ;
-    assign i_vgaLabel1_x      = px_x1 ;
-    assign i_vgaLabel1_y      = px_y1 ;
+    assign i_vgaLabel1_x      = px_x0 ;
+    assign i_vgaLabel1_y      = px_y0 ;
+    assign i_vgaLabel1_en     = counter[0] ;
     assign i_vgaLabel1_din    = o_labelsRam_dout ;
     // ---------------------------------------- //
 
@@ -109,7 +111,7 @@ module top (
     wire       i_vgaLabel2_px_clk;
     wire [9:0] i_vgaLabel2_x;
     wire [9:0] i_vgaLabel2_y;
-    wire [7:0] o_vgaLabel2_id;
+    wire       i_vgaLabel2_en;
     wire [7:0] o_vgaLabel2_addr;
     wire [7:0] i_vgaLabel2_din;
     wire [7:0] o_vgaLabel2_dout;
@@ -122,6 +124,7 @@ module top (
       .px_clk(i_vgaLabel2_px_clk),
       .x     (i_vgaLabel2_x     ),
       .y     (i_vgaLabel2_y     ),
+      .en    (i_vgaLabel2_en    ),
       .din   (i_vgaLabel2_din   ),
       //---- output ports ----
       .addr  (o_vgaLabel2_addr  ),
@@ -140,8 +143,9 @@ module top (
     defparam vgaLabel2.offset = 8;
     // Connect Inputs:
     assign i_vgaLabel2_px_clk = px_clk ;
-    assign i_vgaLabel2_x      = px_x1 ;
-    assign i_vgaLabel2_y      = px_y1 ;
+    assign i_vgaLabel2_x      = px_x0 ;
+    assign i_vgaLabel2_y      = px_y0 ;
+    assign i_vgaLabel2_en     = ~counter[0] ;
     assign i_vgaLabel2_din    = o_labelsRam_dout ;
     // ---------------------------------------- //
 
@@ -151,7 +155,7 @@ module top (
     wire       i_vgaLabel3_px_clk;
     wire [9:0] i_vgaLabel3_x;
     wire [9:0] i_vgaLabel3_y;
-    wire [7:0] o_vgaLabel3_id;
+    wire       i_vgaLabel3_en;
     wire [7:0] o_vgaLabel3_addr;
     wire [7:0] i_vgaLabel3_din;
     wire [7:0] o_vgaLabel3_dout;
@@ -164,6 +168,7 @@ module top (
       .px_clk(i_vgaLabel3_px_clk),
       .x     (i_vgaLabel3_x     ),
       .y     (i_vgaLabel3_y     ),
+      .en    (i_vgaLabel3_en    ),
       .din   (i_vgaLabel3_din   ),
       //---- output ports ----
       .addr  (o_vgaLabel3_addr  ),
@@ -182,8 +187,9 @@ module top (
     defparam vgaLabel3.offset = 22;
     // Connect Inputs:
     assign i_vgaLabel3_px_clk = px_clk ;
-    assign i_vgaLabel3_x      = px_x1 ;
-    assign i_vgaLabel3_y      = px_y1 ;
+    assign i_vgaLabel3_x      = px_x0 ;
+    assign i_vgaLabel3_y      = px_y0 ;
+    assign i_vgaLabel3_en     = 1'b 1 ;
     assign i_vgaLabel3_din    = o_labelsRam_dout ;
     // ---------------------------------------- //
 
@@ -194,6 +200,7 @@ module top (
     wire       i_vgaRegister0_px_clk;
     wire [9:0] i_vgaRegister0_x;
     wire [9:0] i_vgaRegister0_y;
+    wire       i_vgaRegister0_en;
     wire [7:0] o_vgaRegister0_addr;
     wire [7:0] i_vgaRegister0_din;
     wire [7:0] o_vgaRegister0_dout;
@@ -206,6 +213,7 @@ module top (
       .px_clk(i_vgaRegister0_px_clk),
       .x     (i_vgaRegister0_x     ),
       .y     (i_vgaRegister0_y     ),
+      .en    (i_vgaRegister0_en    ),
       .din   (i_vgaRegister0_din   ),
       //---- output ports ----
       .addr  (o_vgaRegister0_addr  ),
@@ -215,17 +223,18 @@ module top (
       .h2a   (o_vgaRegister0_h2a   )
     );
     // Define Parameters:
-    defparam vgaRegister0.line = 20;
-    defparam vgaRegister0.col = 2;
-    defparam vgaRegister0.pzoom = 0;
+    defparam vgaRegister0.line = 3;
+    defparam vgaRegister0.col = 3;
+    defparam vgaRegister0.pzoom = 3;
     defparam vgaRegister0.pcolor = `YELLOW;
     defparam vgaRegister0.width = 2;
     defparam vgaRegister0.height = 1;
     // defparam vgaRegister0.offset = ;
     // Connect Inputs:
     assign i_vgaRegister0_px_clk = px_clk ;
-    assign i_vgaRegister0_x      = px_x1 ;
-    assign i_vgaRegister0_y      = px_y1 ;
+    assign i_vgaRegister0_x      = px_x0 ;
+    assign i_vgaRegister0_y      = px_y0 ;
+    assign i_vgaRegister0_en     = 1'b 1 ;
     assign i_vgaRegister0_din    = framecounter ;
     // ---------------------------------------- //
 

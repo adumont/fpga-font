@@ -14,6 +14,7 @@ module vgaModule #(
     input wire         px_clk,
     input wire  [9:0]  x,  // X screen position.
     input wire  [9:0]  y,  // Y screen position.
+    input wire         en, // enabled
     // interface with memory: addr to fetch / data retrieved
     output reg  [7:0]  addr,   // addr of the char to retrieve
     input wire  [7:0]  din,   // addr of the char to retrieve
@@ -28,11 +29,11 @@ module vgaModule #(
   localparam ch2a = 1'b 0;
 
   /* verilator lint_off UNSIGNED */
-  wire active0 = 
-         ( (x >> (3+pzoom)) >= ( col           ) )
+  wire active0 = en
+      && ( (x >> (3+pzoom)) >= ( col           ) )
       && ( (x >> (3+pzoom))  < ( col  + width  ) )
       && ( (y >> (3+pzoom)) >= ( line          ) )
-      && ( (y >> (3+pzoom))  <  (line + height ) );
+      && ( (y >> (3+pzoom))  < (line + height  ) );
   /* verilator lint_on UNSIGNED */
 
   wire [9:0] rel_x, rel_y;
@@ -64,9 +65,5 @@ module vgaModule #(
   begin
     active1 <= active0;
   end
-
-  // always @(*)
-  // begin
-  // end
 
 endmodule
