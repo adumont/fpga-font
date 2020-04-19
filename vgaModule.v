@@ -27,11 +27,13 @@ module vgaModule #(
   // this component needs tranlation, 0 or 1.
   localparam ch2a = 1'b 0;
 
+  /* verilator lint_off UNSIGNED */
   wire active0 = 
          ( (x >> (3+pzoom)) >= ( col           ) )
       && ( (x >> (3+pzoom))  < ( col  + width  ) )
       && ( (y >> (3+pzoom)) >= ( line          ) )
       && ( (y >> (3+pzoom))  <  (line + height ) );
+  /* verilator lint_on UNSIGNED */
 
   wire [9:0] rel_x, rel_y;
 
