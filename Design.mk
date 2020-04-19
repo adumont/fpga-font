@@ -6,7 +6,7 @@ DEPS_font:=\
     ram.v
 
 AUXFILES_font:=\
-    BRAM_8.list
+    font_rom.hex
 
 DEPS_tilemem:=\
     ram.v
@@ -18,10 +18,11 @@ AUXFILES_tilemem:=\
 
 DEPS_TOP:= \
     font.v $(DEPS_font) \
-    nibble2digit.v \
+    hex2asc.v \
     texto.v \
     ram.v \
     vgaModule.v \
+    vgaRegister.v \
     vga_sync.v
 
 AUXFILES_TOP:= \

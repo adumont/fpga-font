@@ -1,7 +1,7 @@
 `default_nettype none
 `include "const.vh"
 
-module vgaModule #(
+module vgaRegister #(
     parameter   line =  10'd 0,  // position of the component on screen (vertical)
     parameter   col  =  10'd 0,  // position of the component on screen (horizontal)
     parameter   pzoom =  0,
@@ -25,7 +25,7 @@ module vgaModule #(
   );
 
   // this component needs tranlation, 0 or 1.
-  localparam ch2a = 1'b 0;
+  localparam ch2a = 1'b 1;
 
   wire active0 = 
          ( (x >> (3+pzoom)) >= ( col           ) )
@@ -38,19 +38,23 @@ module vgaModule #(
   assign rel_x = ( x >> (3+pzoom) ) - col ;  // relative position in the...
   assign rel_y = ( y >> (3+pzoom) ) - line ; // ..."component's area"
 
+  reg nibble0, nibble1; // 0: [7:4], 1: [3:0]
+
   always @(*)
   begin
     addr  = 8'h 00;
     dout  = 8'h 00;
-    h2a   = 1'b  0;
+    h2a   = active1;
     color = `BLACK;
     zoom  = 0;
-    if( active0 ) begin
-      addr = rel_x[7:0] + offset;
-    end
+    nibble0 = rel_x[0:0];
+
     if( active1 ) begin
-      dout  = din;
-      h2a   = ch2a;
+      if(nibble1) 
+        dout  = { 4'h x, din[3:0] };
+      else
+        dout  = { 4'h x, din[7:4] };
+
       color = pcolor;
       zoom  = pzoom;
     end
@@ -61,6 +65,7 @@ module vgaModule #(
   always @(posedge px_clk)
   begin
     active1 <= active0;
+    nibble1 <= nibble0;
   end
 
   // always @(*)

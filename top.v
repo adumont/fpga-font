@@ -73,7 +73,7 @@ module top (
     wire [7:0] o_vgaLabel1_dout;
     wire [2:0] o_vgaLabel1_color;
     wire [1:0] o_vgaLabel1_zoom;
-    wire       o_vgaLabel1_n2d;
+    wire       o_vgaLabel1_h2a;
 
     vgaModule vgaLabel1 (
       //---- input ports ----
@@ -86,7 +86,7 @@ module top (
       .dout  (o_vgaLabel1_dout  ),
       .color (o_vgaLabel1_color ),
       .zoom  (o_vgaLabel1_zoom  ),
-      .n2d   (o_vgaLabel1_n2d   )
+      .h2a   (o_vgaLabel1_h2a   )
     );
     // Define Parameters:
     defparam vgaLabel1.line   = 10;
@@ -115,7 +115,7 @@ module top (
     wire [7:0] o_vgaLabel2_dout;
     wire [2:0] o_vgaLabel2_color;
     wire [1:0] o_vgaLabel2_zoom;
-    wire       o_vgaLabel2_n2d;
+    wire       o_vgaLabel2_h2a;
 
     vgaModule vgaLabel2 (
       //---- input ports ----
@@ -128,7 +128,7 @@ module top (
       .dout  (o_vgaLabel2_dout  ),
       .color (o_vgaLabel2_color ),
       .zoom  (o_vgaLabel2_zoom  ),
-      .n2d   (o_vgaLabel2_n2d   )
+      .h2a   (o_vgaLabel2_h2a   )
     );
     // Define Parameters:
     defparam vgaLabel2.line   = 12;
@@ -157,7 +157,7 @@ module top (
     wire [7:0] o_vgaLabel3_dout;
     wire [2:0] o_vgaLabel3_color;
     wire [1:0] o_vgaLabel3_zoom;
-    wire       o_vgaLabel3_n2d;
+    wire       o_vgaLabel3_h2a;
 
     vgaModule vgaLabel3 (
       //---- input ports ----
@@ -170,7 +170,7 @@ module top (
       .dout  (o_vgaLabel3_dout  ),
       .color (o_vgaLabel3_color ),
       .zoom  (o_vgaLabel3_zoom  ),
-      .n2d   (o_vgaLabel3_n2d   )
+      .h2a   (o_vgaLabel3_h2a   )
     );
     // Define Parameters:
     defparam vgaLabel3.line   = 2;
@@ -185,6 +185,48 @@ module top (
     assign i_vgaLabel3_x      = px_x1 ;
     assign i_vgaLabel3_y      = px_y1 ;
     assign i_vgaLabel3_din    = o_labelsRam_dout ;
+    // ---------------------------------------- //
+
+    // ---------------------------------------- //
+    // vgaRegister0 (vgaRegister)
+    //
+
+    wire       i_vgaRegister0_px_clk;
+    wire [9:0] i_vgaRegister0_x;
+    wire [9:0] i_vgaRegister0_y;
+    wire [7:0] o_vgaRegister0_addr;
+    wire [7:0] i_vgaRegister0_din;
+    wire [7:0] o_vgaRegister0_dout;
+    wire [2:0] o_vgaRegister0_color;
+    wire [1:0] o_vgaRegister0_zoom;
+    wire       o_vgaRegister0_h2a;
+
+    vgaRegister vgaRegister0 (
+      //---- input ports ----
+      .px_clk(i_vgaRegister0_px_clk),
+      .x     (i_vgaRegister0_x     ),
+      .y     (i_vgaRegister0_y     ),
+      .din   (i_vgaRegister0_din   ),
+      //---- output ports ----
+      .addr  (o_vgaRegister0_addr  ),
+      .dout  (o_vgaRegister0_dout  ),
+      .color (o_vgaRegister0_color ),
+      .zoom  (o_vgaRegister0_zoom  ),
+      .h2a   (o_vgaRegister0_h2a   )
+    );
+    // Define Parameters:
+    defparam vgaRegister0.line = 20;
+    defparam vgaRegister0.col = 2;
+    defparam vgaRegister0.pzoom = 0;
+    defparam vgaRegister0.pcolor = `YELLOW;
+    defparam vgaRegister0.width = 2;
+    defparam vgaRegister0.height = 1;
+    // defparam vgaRegister0.offset = ;
+    // Connect Inputs:
+    assign i_vgaRegister0_px_clk = px_clk ;
+    assign i_vgaRegister0_x      = px_x1 ;
+    assign i_vgaRegister0_y      = px_y1 ;
+    assign i_vgaRegister0_din    = framecounter ;
     // ---------------------------------------- //
 
 
@@ -220,10 +262,24 @@ module top (
 
     reg [`FONT_WIDTH-1:0] char_shown;
 
-    wire [7:0] digit_ascii_code;
-    reg  [3:0] hex_digit;
+    // ---------------------------------------- //
+    // hex2asc0 (hex2asc)
+    //
+    wire [7:0] i_hex2asc0_din;
+    wire       i_hex2asc0_h2a;
+    wire [7:0] o_hex2asc0_dout;
 
-    nibble2digit nibble2digit0(hex_digit, digit_ascii_code);
+    hex2asc hex2asc0 (
+      //---- input ports ----
+      .din (i_hex2asc0_din ),
+      .h2a (i_hex2asc0_h2a ),
+      //---- output ports ----
+      .dout(o_hex2asc0_dout)
+    );
+    // Connect Inputs:
+    assign i_hex2asc0_din  = o_vgaLabel1_dout  | o_vgaLabel2_dout  | o_vgaLabel3_dout | o_vgaRegister0_dout;
+    assign i_hex2asc0_h2a  = o_vgaLabel1_h2a   | o_vgaLabel2_h2a   | o_vgaLabel3_h2a  | o_vgaRegister0_h2a;
+    // ---------------------------------------- //
 
     wire [7:0] char_texto;
     wire [9:0] texto_index_tmp = px_x2 >> (3+`ZoomTexto) ;
@@ -231,37 +287,39 @@ module top (
     texto texto0( texto_index_tmp[3:0] , char_texto);
 
     always @(*) begin
-      char_shown = 8'h00 | o_vgaLabel1_dout  | o_vgaLabel2_dout  | o_vgaLabel3_dout ; // * Add all vgaBlocks here (bitwise OR)
-      color2 = `BLACK    | o_vgaLabel1_color | o_vgaLabel2_color | o_vgaLabel3_color; // * Add all vgaBlocks here (bitwise OR)
-      zoom = 0 | o_vgaLabel1_zoom | o_vgaLabel2_zoom | o_vgaLabel3_zoom;
+      // char_shown = o_hex2asc0_dout ; // * Add all vgaBlocks here (bitwise OR)
+      color2 = `BLACK | o_vgaLabel1_color | o_vgaLabel2_color | o_vgaLabel3_color | o_vgaRegister0_color; // * Add all vgaBlocks here (bitwise OR)
+      zoom = o_vgaLabel1_zoom | o_vgaLabel2_zoom | o_vgaLabel3_zoom | o_vgaRegister0_zoom;
 
-      hex_digit = 4'b 0;
+      // hex_digit = 4'b 0;
 
-      // TODO move to it's own vgaModule block
-      if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
-      begin
-        hex_digit = counter[3:0];
-        char_shown = digit_ascii_code;
-        zoom = `ZoomCounter;
-        color2 = `GREEN;
-      end
+      // // TODO a "led" block (on/off, 0/1), that shows a single bit (~ led)
 
-      // TODO move to it's own vgaModule block (same as the previous one)
-      else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
-      begin
-        hex_digit = counter[7:4];
-        char_shown = digit_ascii_code;
-        zoom = `ZoomCounter;
-        color2 = `GREEN;
-      end
+      // // TODO move to it's own vgaModule block
+      // if ( px_x2 >> (3+`ZoomCounter) == 10 && px_y2 >> (3+`ZoomCounter) ==  8  ) 
+      // begin
+      //   hex_digit = counter[3:0];
+      //   char_shown = digit_ascii_code;
+      //   zoom = `ZoomCounter;
+      //   color2 = `GREEN;
+      // end
 
-      // TODO move to it's own vgaModule block
-      else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  0  )
-      begin
-        char_shown = char_texto;
-        zoom = `ZoomTexto;
-        color2 = `WHITE;
-      end
+      // // TODO move to it's own vgaModule block (same as the previous one)
+      // else if ( px_x2 >> (3+`ZoomCounter) ==  9 && px_y2 >> (3+`ZoomCounter) ==  8  )
+      // begin
+      //   hex_digit = counter[7:4];
+      //   char_shown = digit_ascii_code;
+      //   zoom = `ZoomCounter;
+      //   color2 = `GREEN;
+      // end
+
+      // // TODO move to it's own vgaModule block
+      // else if ( px_x2 >> (3+`ZoomTexto) <= 5 && px_y2 >> (3+`ZoomTexto) ==  0  )
+      // begin
+      //   char_shown = char_texto;
+      //   zoom = `ZoomTexto;
+      //   color2 = `WHITE;
+      // end
 
     end
 
@@ -274,7 +332,7 @@ module top (
        .px_clk(px_clk),          // Pixel clock.
        .pos_x( px_x2 >> zoom ), // X screen position.
        .pos_y( px_y2 >> zoom ), // Y screen position.
-       .character( char_shown ),  // Character at this pixel
+       .character( o_hex2asc0_dout ),  // Character at this pixel
        // output
        .data( font_bit )         // Output RGB stream.
     );
@@ -318,7 +376,7 @@ module top (
         framecounter <= framecounter + 1;
     end
 
-    always @(posedge framecounter[2])
+    always @(posedge framecounter[0])
     begin
         counter <= counter + 1;
     end
