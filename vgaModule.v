@@ -2,68 +2,65 @@
 `include "const.vh"
 
 module vgaModule #(
-    parameter   line =  10'd 0,  // position of the component on screen (vertical)
-    parameter   col  =  10'd 0,  // position of the component on screen (horizontal)
-    parameter   pzoom =  0,
+    parameter   line =  7'd 0,  // position of the component on screen (vertical)
+    parameter   col  =  7'd 0,  // position of the component on screen (horizontal)
+    parameter   pzoom =  `zm_w'b 0,
     parameter   pcolor = `WHITE,
     parameter   width  = 1,
-    parameter   height = 1,
-    parameter   offset = 8'h 00
+    parameter   offset = 8'h 0
   ) (
     // input
-    input wire         px_clk,
-    input wire  [9:0]  x,  // X screen position.
-    input wire  [9:0]  y,  // Y screen position.
-    input wire         en, // enabled
-    // interface with memory: addr to fetch / data retrieved
-    output reg  [7:0]  addr,   // addr of the char to retrieve
-    input wire  [7:0]  din,   // addr of the char to retrieve
-    // output: data to show
-    output reg  [7:0]  dout,  // data to render
-    output reg  [2:0]  color,
-    output reg  [1:0]  zoom,
-    output reg         h2a    // requieres translation of Hex Nibble to Digit
+    input wire            px_clk,
+    input wire  [`stream] in, // input stream
+    input wire            en, // enabled
+    // output
+    output reg  [`stream] out // output stream
   );
+  
+  // `include "functions.vh"
 
   // this component needs tranlation, 0 or 1.
   localparam ch2a = 1'b 0;
 
+  wire [`xc_w-1:0] x = in[ `xc_s +: `xc_w ];
+  wire [`yc_w-1:0] y = in[ `yc_s +: `yc_w ];
+
+  // Active means Enabled and x,y is in the 
   /* verilator lint_off UNSIGNED */
-  wire active0 = en
-      && ( (x >> (3+pzoom)) >= ( col           ) )
-      && ( (x >> (3+pzoom))  < ( col  + width  ) )
-      && ( (y >> (3+pzoom)) >= ( line          ) )
-      && ( (y >> (3+pzoom))  < (line + height  ) );
+  wire active = en
+      && ( (x[3 +: `xc_w-3] >> pzoom ) >= ( col          ) )
+      && ( (x[3 +: `xc_w-3] >> pzoom )  < ( col  + width ) )
+      && ( (y[3 +: `yc_w-3] >> pzoom ) == ( line         ) );
   /* verilator lint_on UNSIGNED */
 
-  wire [9:0] rel_x, rel_y;
+  wire [`xc_w-4:0] rel_x = ( x[3 +: `xc_w-3] >> pzoom ) - col ;  // relative position in the block
 
-  assign rel_x = ( x >> (3+pzoom) ) - col ;  // relative position in the...
-  assign rel_y = ( y >> (3+pzoom) ) - line ; // ..."component's area"
+  wire [`vpart2_w-1:0] tmp = {`vpart2_w {1'b 0}};
 
-  always @(*)
-  begin
-    addr  = 8'h 00;
-    dout  = 8'h 00;
-    h2a   = 1'b  0;
-    color = `BLACK;
-    zoom  = 0;
-    if( active0 ) begin
-      addr = rel_x[7:0] + offset;
-    end
-    if( active1 ) begin
-      dout  = din;
-      h2a   = ch2a;
-      color = pcolor;
-      zoom  = pzoom;
-    end
-  end
+  assign tmp = {
+      3'd0,                     // chip select
+      {  {1'b0, rel_x[`xc_w-4:0] } + offset }, // addr
+      ch2a,
+      pzoom,
+      `BLACK, // bg color
+      pcolor
+     };
 
-  reg  active1 = 1'b  0;
+  // always @(*)
+  // begin
+  //   tmp=set_addr(out, { {(`addr_w-8){1'b0}} , {rel_x[7:0]} } + offset);
+  //   tmp=set_ha(tmp, ch2a);
+  //   tmp=set_fg(tmp, pcolor);
+  //   tmp=set_zm(tmp, pzoom);
+  // end
 
   always @(posedge px_clk)
   begin
-    active1 <= active0;
+    out[`vpart1] <= in[`vpart1];
+    if(active)
+      out[`vpart2] <= in[`vpart2] | tmp ;
+    else
+      out[`vpart2] <= in[`vpart2];
   end
 
 endmodule

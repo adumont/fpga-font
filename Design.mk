@@ -19,7 +19,7 @@ AUXFILES_tilemem:=\
 DEPS_TOP:= \
     font.v $(DEPS_font) \
     hex2asc.v \
-    texto.v \
+    register.v \
     ram.v \
     vgaModule.v \
     vgaRegister.v \
