@@ -19,6 +19,8 @@ module top (
 
     // avoid warning if we don't use led
     assign leds = 8'b 0100_0010;
+
+    localparam def_bg = `BLACK; // default background color
     
     // Output signals from vga_sync0
     wire px_clk;
@@ -39,7 +41,7 @@ module top (
        .px_clk(px_clk)             // Pixel clock
     );
 
-    wire [`stream] vga_str0 = { {`vpart2_w {1'b 0}}, px_y0, px_x0, vsync0, hsync0 };
+    wire [`stream] vga_str0 = { {`vpart2_w {1'b 0}}, activevideo0, px_y0, px_x0, vsync0, hsync0 };
 
     // reg [1:0] zoom = 0;
     // `define ZoomCounter 2
@@ -316,32 +318,28 @@ module top (
     assign i_reg1_in  = o_reg0_out[0 +: `zm_s] ;
     // ---------------------------------------- //
 
-
-    // TODO rename these wires
-    wire [`xc_w-1:0] px_x3 = o_reg1_out[`xc] ;
-    wire [`yc_w-1:0] px_y3 = o_reg1_out[`yc] ;
-    wire [`fg_w-1:0] fg    = o_reg1_out[`fg] ;
-    wire [`bg_w-1:0] bg    = o_reg1_out[`bg] ;
-
-    always @(*) begin
-        rgb = bg; // background color
-        if ( o_font0_data )
-          rgb = fg;
-
-        // Draw a border
-        // TODO move to it's own vgaModule block
-        else if (px_y3 == 0 || px_y3 == 479 || px_x3 == 0 || px_x3 == 639 )
-          rgb = `GREEN;
-      
-        else
-          rgb = o_reg1_out[`bg]; // background color
-    end
-
+    // TODO rename these wires (also in GUI)
+    wire [`xc_w-1:0] px_x3        = o_reg1_out[`xc] ;
+    wire [`yc_w-1:0] px_y3        = o_reg1_out[`yc] ;
+    wire [`ab_w-1:0] ab           = o_reg1_out[`ab] ;
+    wire [`fg_w-1:0] fg           = o_reg1_out[`fg] ;
+    wire [`bg_w-1:0] bg           = o_reg1_out[`bg] ;
+    wire [`av_w-1:0] activevideo3 = o_reg1_out[`av] ;
     assign hsync = o_reg1_out[`hs];
     assign vsync = o_reg1_out[`vs];
 
+    always @(*) begin
+        rgb = def_bg; // default background color
+        if ( ab )
+          rgb = o_font0_data ? fg : bg;
+        // // Debug Draw a border
+        // else if (px_y3 <= 0+7 || px_y3 >= 479-7 || px_x3 <= 0+7 || px_x3 >= 639-7 )
+        //   rgb = `GREEN;
+        else
+          rgb = def_bg; // default background color
+    end
 
-    wire endframe = ( o_reg1_out[`xc] == 639 ) && ( o_reg1_out[`yc] == 479 );
+    wire endframe = ( px_x3 == 639 ) && ( px_y3 == 479 );
 
     // Register test.
     reg [7:0] framecounter = 8'h 00;  // Frame counter
