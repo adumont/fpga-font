@@ -23,29 +23,35 @@ module vgaModule #(
   localparam ch2a = 1'b 0;
 
 // DEBUG
-wire [`hs_w-1:0] in_hs = in[`hs];
-wire [`vs_w-1:0] in_vs = in[`vs];
-wire [`xc_w-1:0] in_xc = in[`xc];
-wire [`yc_w-1:0] in_yc = in[`yc];
-wire [`av_w-1:0] in_av = in[`av];
-wire [`ab_w-1:0] in_ab = in[`ab];
-wire [`fg_w-1:0] in_fg = in[`fg];
-wire [`bg_w-1:0] in_bg = in[`bg];
-wire [`zm_w-1:0] in_zm = in[`zm];
-wire [`ha_w-1:0] in_ha = in[`ha];
-wire [`addr_w-1:0] in_addr = in[`addr];
+  // Stream: in
 
-wire [`hs_w-1:0] out_hs = out[`hs];
-wire [`vs_w-1:0] out_vs = out[`vs];
-wire [`xc_w-1:0] out_xc = out[`xc];
-wire [`yc_w-1:0] out_yc = out[`yc];
-wire [`av_w-1:0] out_av = out[`av];
-wire [`ab_w-1:0] out_ab = out[`ab];
-wire [`fg_w-1:0] out_fg = out[`fg];
-wire [`bg_w-1:0] out_bg = out[`bg];
-wire [`zm_w-1:0] out_zm = out[`zm];
-wire [`ha_w-1:0] out_ha = out[`ha];
-wire [`addr_w-1:0] out_addr = out[`addr];
+  wire [`hs_w-1:0] in_hs = in[`hs];
+  wire [`vs_w-1:0] in_vs = in[`vs];
+  wire [`xc_w-1:0] in_xc = in[`xc];
+  wire [`yc_w-1:0] in_yc = in[`yc];
+  wire [`av_w-1:0] in_av = in[`av];
+  wire [`ab_w-1:0] in_ab = in[`ab];
+  wire [`fg_w-1:0] in_fg = in[`fg];
+  wire [`bg_w-1:0] in_bg = in[`bg];
+  wire [`zm_w-1:0] in_zm = in[`zm];
+  wire [`ha_w-1:0] in_ha = in[`ha];
+  wire [`cs_w-1:0] in_cs = in[`cs];
+  wire [`addr_w-1:0] in_addr = in[`addr];
+
+  // Stream: out
+
+  wire [`hs_w-1:0] out_hs = out[`hs];
+  wire [`vs_w-1:0] out_vs = out[`vs];
+  wire [`xc_w-1:0] out_xc = out[`xc];
+  wire [`yc_w-1:0] out_yc = out[`yc];
+  wire [`av_w-1:0] out_av = out[`av];
+  wire [`ab_w-1:0] out_ab = out[`ab];
+  wire [`fg_w-1:0] out_fg = out[`fg];
+  wire [`bg_w-1:0] out_bg = out[`bg];
+  wire [`zm_w-1:0] out_zm = out[`zm];
+  wire [`ha_w-1:0] out_ha = out[`ha];
+  wire [`cs_w-1:0] out_cs = out[`cs];
+  wire [`addr_w-1:0] out_addr = out[`addr];
 // end DEBUG
 
   wire [`xc_w-1:0] x = in[ `xc_s +: `xc_w ];
@@ -64,8 +70,8 @@ wire [`addr_w-1:0] out_addr = out[`addr];
   wire [`vpart2_w-1:0] tmp;
 
   assign tmp = {
-      3'd0,                     // chip select
       {  {1'b0, rel_x[`xc_w-4:0] } + offset }, // addr
+      3'd0,                     // chip select
       ch2a,
       pzoom,
       `BLACK, // bg color // TODO implement parameter

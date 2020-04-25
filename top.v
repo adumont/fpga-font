@@ -219,7 +219,7 @@ module top (
     defparam labelsRam.ROMFILE = "Labels.lst";
     // Connect Inputs:
     assign i_labelsRam_clk      = px_clk ;
-    assign i_labelsRam_addr     = o_vgaLabel3_out[`addr_s +: 8]; // FIX THIS +:8 --> chip select & ADDR
+    assign i_labelsRam_addr     = o_vgaLabel3_out[`addr]; // ADDR
     // we don't use write port here...
     assign i_labelsRam_write_en = 1'b 0 ;
     assign i_labelsRam_din      = 8'b 0 ;
@@ -229,9 +229,9 @@ module top (
     // reg0 (register)
     //
 
-    wire                         i_reg0_clk;
-    wire [`stream_w-`addr_w-1:0] i_reg0_in;
-    wire [`stream_w-`addr_w-1:0] o_reg0_out;
+    wire               i_reg0_clk;
+    wire [`addr_s-1:0] i_reg0_in;  // we keep from bit 0 up-
+    wire [`addr_s-1:0] o_reg0_out; // -to `cs_s not included
 
     register reg0 (
       //---- input ports ----
@@ -241,10 +241,29 @@ module top (
       .out(o_reg0_out)
     );
     // Define Parameters:
-    defparam reg0.w = `stream_w-`addr_w;
+    defparam reg0.w = `addr_s;
     // Connect Inputs:
     assign i_reg0_clk = px_clk ;
     assign i_reg0_in  = o_vgaLabel3_out[0 +: `addr_s];
+    // ---------------------------------------- //
+
+
+    // ---------------------------------------- //
+    // ramMux (combinational block)
+    //
+
+    // we Mux the ram's output and only select the
+    // correct one (cs)
+
+    reg [7:0] o_ramMux_dout;
+
+    always @(*)
+    begin
+      case( o_reg0_out[`cs] )
+        `cs_w'd 0: o_ramMux_dout = o_labelsRam_dout; // Label RAM, cs = 0
+        default: o_ramMux_dout = 8'h00;
+      endcase
+    end
     // ---------------------------------------- //
 
     // ---------------------------------------- //
