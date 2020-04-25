@@ -29,7 +29,7 @@ module ram #(
   begin
     if (write_en)
       mem[(addr)] <= din;
-    dout = mem[addr];
+    dout <= mem[addr];
   end
 endmodule
 
