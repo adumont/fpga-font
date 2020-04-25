@@ -17,9 +17,6 @@ module top (
 
     `include "functions.vh"
 
-    // avoid warning if we don't use led
-    assign leds = 8'b 0100_0010;
-
     localparam def_bg = `BLACK; // default background color
     
     // Output signals from vga_sync0
@@ -351,10 +348,19 @@ module top (
         framecounter <= framecounter + 1;
     end
 
-    always @(posedge framecounter[0])
+
+    `ifndef SYNTHESIS // SIMULATION
+      localparam ratio=0;
+    `else // SYNTHESIS
+      localparam ratio=4;
+    `endif
+
+    always @(posedge framecounter[ratio])
     begin
         counter <= counter + 1;
     end
+
+    assign leds = counter;
 
 endmodule
 
