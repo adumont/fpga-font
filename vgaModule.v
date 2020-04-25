@@ -61,7 +61,7 @@ wire [`addr_w-1:0] out_addr = out[`addr];
 
   wire [`xc_w-4:0] rel_x = ( x[3 +: `xc_w-3] >> pzoom ) - col ;  // relative position in the block
 
-  wire [`vpart2_w-1:0] tmp = {`vpart2_w {1'b 0}};
+  wire [`vpart2_w-1:0] tmp;
 
   assign tmp = {
       3'd0,                     // chip select
