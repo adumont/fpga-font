@@ -157,15 +157,15 @@ void MainWindow::updateUI()
     }
 
     // LEDS
-    ui->R_LEDs->setText(formatData( top->rgb ));
-    ui->led0->setState( top->rgb >> 0 & 1 );
-    ui->led1->setState( top->rgb >> 1 & 1 );
-    ui->led2->setState( top->rgb >> 2 & 1 );
-    ui->led3->setState( top->rgb >> 3 & 1 );
-    ui->led4->setState( top->rgb >> 4 & 1 );
-    ui->led5->setState( top->rgb >> 5 & 1 );
-    ui->led6->setState( top->rgb >> 6 & 1 );
-    ui->led7->setState( top->rgb >> 7 & 1 );
+    ui->R_LEDs->setText(formatData( top->leds ));
+    ui->led0->setState( top->leds >> 0 & 1 );
+    ui->led1->setState( top->leds >> 1 & 1 );
+    ui->led2->setState( top->leds >> 2 & 1 );
+    ui->led3->setState( top->leds >> 3 & 1 );
+    ui->led4->setState( top->leds >> 4 & 1 );
+    ui->led5->setState( top->leds >> 5 & 1 );
+    ui->led6->setState( top->leds >> 6 & 1 );
+    ui->led7->setState( top->leds >> 7 & 1 );
 
 }
 
