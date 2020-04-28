@@ -22,13 +22,17 @@ DEPS_TOP:= \
     register.v \
     ram.v \
     vgaModule.v \
-    vgaRegister.v \
+    vgaWord.v \
+    ufifo.v \
+    rxuartlite.v \
+    debouncer.v \
     vga_sync.v
 
 AUXFILES_TOP:= \
     $(AUXFILES_font) \
     $(AUXFILES_tilemem) \
     Labels.lst \
+    vgaModuleDebug.vh \
   	const.vh
 
 ifeq ($(MODULE), $(TOP))

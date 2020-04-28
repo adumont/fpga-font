@@ -5,6 +5,7 @@ module hex2asc(
     // input
     input wire [7:0] din,
     input wire       h2a, // hexadecimal to ascii?
+    input wire       nb,  // nibble [0|1]
     // output
     output reg [7:0] dout
   );
@@ -13,7 +14,7 @@ module hex2asc(
   begin
     dout = din;
     if (h2a) begin
-      case (din[3:0]) // hexadecimal to ascii
+      case ( nb ? din[3:0] : din[7:4]) // hexadecimal to ascii
           4'h0: dout = 8'h30;
           4'h1: dout = 8'h31;
           4'h2: dout = 8'h32;

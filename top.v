@@ -6,6 +6,9 @@
 module top (
         input  wire       clk,       // System clock.
 
+        input  wire       RX,
+        output wire       TX,
+
         output wire       hsync,     // Horizontal sync out signal
         output wire       vsync,     // Vertical sync out signal
         output reg  [2:0] rgb,       // Red/Green/Blue VGA signal
@@ -15,10 +18,18 @@ module top (
         output wire [7:0] leds       // board leds
     );
 
+    //`ifdef BOARD_HAVE_BUTTONS
+    wire sw1_d; // pulse when sw pressed
+    wire sw1_u; // pulse when sw released
+    wire sw1_s; // sw state
+    debouncer db_sw1 (.clk(clk), .PB(sw1), .PB_down(sw1_d), .PB_up(sw1_u), .PB_state(sw1_s));
+    //`endif
+
     `include "functions.vh"
 
     localparam def_bg = `BLACK; // default background color
-    
+    localparam baudsDivider=24'd104;
+
     // Output signals from vga_sync0
     wire px_clk;
     wire hsync0, vsync0, activevideo0;
@@ -121,6 +132,36 @@ module top (
     // ---------------------------------------- //
 
     // ---------------------------------------- //
+    // vgaInbox (vgaWord)
+    //
+
+    wire           i_vgaInbox_px_clk;
+    wire [`stream] i_vgaInbox_in;
+    wire           i_vgaInbox_en;
+    wire [`stream] o_vgaInbox_out;
+
+    vgaWord vgaInbox (
+      //---- input ports ----
+      .px_clk(i_vgaInbox_px_clk),
+      .in    (i_vgaInbox_in    ),
+      .en    (i_vgaInbox_en    ),
+      //---- output ports ----
+      .out   (o_vgaInbox_out   )
+    );
+    // Define Parameters:
+    defparam vgaInbox.line = 20;
+    defparam vgaInbox.col = 0;
+    defparam vgaInbox.pzoom = `zm_w'b 0;
+    defparam vgaInbox.pcolor = `WHITE;
+    defparam vgaInbox.width = 64;
+    // Connect Inputs:
+    assign i_vgaInbox_px_clk = px_clk ;
+    assign i_vgaInbox_in     = o_vgaLabel2_out ;
+    assign i_vgaInbox_en     = 1 ;
+    // ---------------------------------------- //
+
+
+    // ---------------------------------------- //
     // vgaLabel3 (vgaModule)
     //
     wire           i_vgaLabel3_px_clk;
@@ -145,55 +186,9 @@ module top (
     defparam vgaLabel3.offset = 8'd 22;
     // Connect Inputs:
     assign i_vgaLabel3_px_clk = px_clk ;
-    assign i_vgaLabel3_in     = o_vgaLabel2_out ;
+    assign i_vgaLabel3_in     = o_vgaInbox_out ;
     assign i_vgaLabel3_en     = 1 ;
     // ---------------------------------------- //
-
-    // // ---------------------------------------- //
-    // // vgaRegister0 (vgaRegister)
-    // //
-
-    // wire       i_vgaRegister0_px_clk;
-    // wire [9:0] i_vgaRegister0_x;
-    // wire [9:0] i_vgaRegister0_y;
-    // wire       i_vgaRegister0_en;
-    // wire [7:0] o_vgaRegister0_addr;
-    // wire [7:0] i_vgaRegister0_din;
-    // wire [7:0] o_vgaRegister0_dout;
-    // wire [2:0] o_vgaRegister0_color;
-    // wire [1:0] o_vgaRegister0_zoom;
-    // wire       o_vgaRegister0_h2a;
-
-    // vgaRegister vgaRegister0 (
-    //   //---- input ports ----
-    //   .px_clk(i_vgaRegister0_px_clk),
-    //   .x     (i_vgaRegister0_x     ),
-    //   .y     (i_vgaRegister0_y     ),
-    //   .en    (i_vgaRegister0_en    ),
-    //   .din   (i_vgaRegister0_din   ),
-    //   //---- output ports ----
-    //   .addr  (o_vgaRegister0_addr  ),
-    //   .dout  (o_vgaRegister0_dout  ),
-    //   .color (o_vgaRegister0_color ),
-    //   .zoom  (o_vgaRegister0_zoom  ),
-    //   .h2a   (o_vgaRegister0_h2a   )
-    // );
-    // // Define Parameters:
-    // defparam vgaRegister0.line = 3;
-    // defparam vgaRegister0.col = 3;
-    // defparam vgaRegister0.pzoom = 3;
-    // defparam vgaRegister0.pcolor = `YELLOW;
-    // defparam vgaRegister0.width = 2;
-    // defparam vgaRegister0.height = 1;
-    // // defparam vgaRegister0.offset = ;
-    // // Connect Inputs:
-    // assign i_vgaRegister0_px_clk = px_clk ;
-    // assign i_vgaRegister0_x      = px_x0 ;
-    // assign i_vgaRegister0_y      = px_y0 ;
-    // assign i_vgaRegister0_en     = 1'b 1 ;
-    // assign i_vgaRegister0_din    = framecounter ;
-    // // ---------------------------------------- //
-
 
     // ---------------------------------------- //
     // labelsRam (ram)
@@ -261,6 +256,7 @@ module top (
     begin
       case( o_reg0_out[`cs] )
         `cs_w'd 0: o_ramMux_dout = o_labelsRam_dout; // Label RAM, cs = 0
+        `cs_w'd 1: o_ramMux_dout = INBOX_o_dmp_data; // INBOX, cs = 1
         default: o_ramMux_dout = 8'h00;
       endcase
     end
@@ -271,17 +267,20 @@ module top (
     //
     wire [7:0] i_hex2asc0_din;
     wire       i_hex2asc0_h2a;
+    wire       i_hex2asc0_nb ;
     wire [7:0] o_hex2asc0_dout;
 
     hex2asc hex2asc0 (
       //---- input ports ----
       .din (i_hex2asc0_din ),
       .h2a (i_hex2asc0_h2a ),
+      .nb  (i_hex2asc0_nb  ),
       //---- output ports ----
       .dout(o_hex2asc0_dout)
     );
     // Connect Inputs:
-    assign i_hex2asc0_din  = o_labelsRam_dout;
+    assign i_hex2asc0_din  = o_ramMux_dout;
+    assign i_hex2asc0_nb   = o_reg0_out[`nb];
     assign i_hex2asc0_h2a  = o_reg0_out[`ha];
     // ---------------------------------------- //
 
@@ -380,6 +379,89 @@ module top (
     end
 
     assign leds = counter;
+
+    // ---------------------------------------- //
+    // Power-Up Reset
+    // reset_n low for (2^reset_counter_size) first clocks
+    wire reset_n;
+
+    localparam reset_counter_size = 2;
+    reg [(reset_counter_size-1):0] reset_reg = 0;
+
+    always @(posedge clk)
+        reset_reg <= reset_reg + { {(reset_counter_size-1) {1'b0}} , !reset_n};
+
+    assign reset_n = &reset_reg;
+    // ---------------------------------------- //
+
+    // ---------------------------------------- //
+    // UART-RX
+    //
+    // input ports
+    wire       rx_i_uart_rx;
+    // output ports
+    wire       rx_o_wr;
+    wire [7:0] rx_o_data;
+    rxuartlite #(.CLOCKS_PER_BAUD(baudsDivider)) rx (
+        .i_clk(clk),
+        .i_uart_rx(rx_i_uart_rx),
+        .o_wr(rx_o_wr),
+        .o_data(rx_o_data)
+    );
+    // Connect inputs
+    assign rx_i_uart_rx = RX;
+    // ---------------------------------------- //
+
+
+    // ---------------------------------------- //
+    // INBOX (FIFO)
+    //
+    wire              INBOX_i_wr;
+    wire signed [7:0] INBOX_i_data;
+    wire              INBOX_i_rd;
+    wire signed [7:0] INBOX_o_data;
+    wire              INBOX_empty_n;
+    wire              INBOX_full;
+    wire              INBOX_i_rst;
+    // dump ports
+    wire              INBOX_i_dmp_clk;
+    wire        [4:0] INBOX_i_dmp_pos;
+    wire        [7:0] INBOX_o_dmp_data;
+    wire              INBOX_o_dmp_valid;
+
+    /* verilator lint_off PINMISSING */
+    ufifo #(.LGFLEN(4'd5)) INBOX (
+        // write port (push)
+        .i_wr(INBOX_i_wr),
+        .i_data(INBOX_i_data),
+        // read port (pop)
+        .i_rd(INBOX_i_rd),
+        .o_data(INBOX_o_data),
+        // flags
+        .o_empty_n( INBOX_empty_n ), // not empty
+        .o_full( INBOX_full ),
+        // .o_status(),
+        // dump ports
+        .i_dmp_clk(INBOX_i_dmp_clk),     // dump position in queue
+        .i_dmp_pos(INBOX_i_dmp_pos),     // dump position in queue
+        .o_dmp_data(INBOX_o_dmp_data),   // value at dump position
+        .o_dmp_valid(INBOX_o_dmp_valid), // i_dmp_pos is valid
+        // clk, rst
+        .i_rst(INBOX_i_rst),
+        .i_clk(clk)
+    );
+    /* verilator lint_on PINMISSING */
+    defparam INBOX.RXFIFO=1'b1;
+    // Connect inputs
+    assign INBOX_i_data = rx_o_data;
+    assign INBOX_i_wr = rx_o_wr;
+    assign INBOX_i_rd = sw1_d;
+    assign INBOX_i_rst = 0;
+    assign INBOX_i_dmp_clk = px_clk;
+    assign INBOX_i_dmp_pos = o_vgaLabel3_out[`addr_s +: 4'd5];
+    // ---------------------------------------- //
+
+    assign TX=RX; // UART Loopback
 
 endmodule
 

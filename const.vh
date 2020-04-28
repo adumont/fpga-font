@@ -13,6 +13,7 @@
 `define YELLOW 3'b 110
 `define WHITE  3'b 111
 
+
 // Vector parts
 `define hs 0:0 // Horizontal sync (1 bit)
 `define vs 1:1 // Vertical Sync (1 bit)
@@ -23,13 +24,14 @@
 `define fg 26:24 // Foreground color (3 bits)
 `define bg 29:27 // Background color (3 bits)
 `define zm 31:30 // Zoom (2 bits)
-`define ha 32:32 // Hex to Ascii (1 bit)
-`define cs 35:33 // ram chip select (3 bits)
-`define addr 43:36 // Address for RAM/ROM lookup (8 bits)
+`define nb 32:32 // Nibble [1|0] (1 bit)
+`define ha 33:33 // Hex to Ascii (1 bit)
+`define cs 36:34 // ram chip select (3 bits)
+`define addr 44:37 // Address for RAM/ROM lookup (8 bits)
 
-`define stream 43:0 // whole vector
+`define stream 44:0 // whole vector
 `define vpart1 22:0 // LSB part of the vector
-`define vpart2 43:23 // MSB part of the vector
+`define vpart2 44:23 // MSB part of the vector
 
 // start bits
 `define hs_s 0 // Horizontal sync, start bit
@@ -41,9 +43,10 @@
 `define fg_s 24 // Foreground color, start bit
 `define bg_s 27 // Background color, start bit
 `define zm_s 30 // Zoom, start bit
-`define ha_s 32 // Hex to Ascii, start bit
-`define cs_s 33 // ram chip select, start bit
-`define addr_s 36 // Address for RAM/ROM lookup, start bit
+`define nb_s 32 // Nibble [1|0], start bit
+`define ha_s 33 // Hex to Ascii, start bit
+`define cs_s 34 // ram chip select, start bit
+`define addr_s 37 // Address for RAM/ROM lookup, start bit
 
 `define stream_s 0 // whole vector, start bit
 `define vpart1_s 0 // LSB part of the vector, start bit
@@ -59,11 +62,13 @@
 `define fg_w 3 // Foreground color, width
 `define bg_w 3 // Background color, width
 `define zm_w 2 // Zoom, width
+`define nb_w 1 // Nibble [1|0], width
 `define ha_w 1 // Hex to Ascii, width
 `define cs_w 3 // ram chip select, width
 `define addr_w 8 // Address for RAM/ROM lookup, width
 
-`define stream_w 44 // whole vector, width
+`define stream_w 45 // whole vector, width
 `define vpart1_w 23 // LSB part of the vector, width
-`define vpart2_w 21 // MSB part of the vector, width
+`define vpart2_w 22 // MSB part of the vector, width
+
 `endif // __CONST_VH__
