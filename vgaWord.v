@@ -32,7 +32,7 @@ module vgaWord #(
 
   // Active means Enabled and x,y is in the 
   /* verilator lint_off UNSIGNED */
-  wire active = en
+  wire active = en && rel_x[1] 
       && ( (x[3 +: `xc_w-3] >> pzoom ) >= ( col          ) )
       && ( (x[3 +: `xc_w-3] >> pzoom )  < ( col  + width ) )
       && ( (y[3 +: `yc_w-3] >> pzoom ) == ( line         ) );
@@ -43,7 +43,7 @@ module vgaWord #(
   wire [`vpart2_w-1:0] tmp;
 
   assign tmp = {
-      {3'b0, rel_x[1 +:5] }, // addr
+      {3'b0, rel_x[2 +:5] }, // addr
       3'd1, // chip select
       ch2a,
       rel_x[0], // nibble
