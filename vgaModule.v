@@ -71,7 +71,7 @@ module vgaModule #(
 
   assign tmp = {
       {  {1'b0, rel_x[`xc_w-4:0] } + offset }, // addr
-      3'd0, // chip select
+      `cs_w'd0, // chip select
       ch2a,
       1'b0, // nibble
       pzoom,

@@ -44,7 +44,7 @@ module vgaWord #(
 
   assign tmp = {
       {3'b0, rel_x[2 +:5] }, // addr
-      3'd1, // chip select
+      `cs_w'd1, // chip select
       ch2a,
       rel_x[0], // nibble
       pzoom,
