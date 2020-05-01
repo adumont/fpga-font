@@ -247,17 +247,19 @@ module top (
     // ramMux (combinational block)
     //
 
-    // we Mux the ram's output and only select the
-    // correct one (cs)
+    // we Mux the ram's output & valid signals 
+    // and only select the correct one, depending
+    // on chip-select (cs)
 
     reg [7:0] o_ramMux_dout;
+    reg       o_ramMux_valid;
 
     always @(*)
     begin
       case( o_reg0_out[`cs] )
-        `cs_w'd 0: o_ramMux_dout = o_labelsRam_dout; // Label RAM, cs = 0
-        `cs_w'd 1: o_ramMux_dout = INBOX_o_dmp_data; // INBOX, cs = 1
-        default: o_ramMux_dout = 8'h00;
+        `cs_w'd 0: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, o_labelsRam_dout } ; // Label RAM, cs = 0
+        `cs_w'd 1: { o_ramMux_valid, o_ramMux_dout } = { INBOX_o_dmp_valid, INBOX_o_dmp_data }; // INBOX, cs = 1
+        default: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, 8'h00 };
       endcase
     end
     // ---------------------------------------- //
@@ -315,9 +317,12 @@ module top (
     // ---------------------------------------- //
     // reg1 (register)
     //
-    wire             i_reg1_clk;
-    wire [`zm_s-1:0] i_reg1_in;
-    wire [`zm_s-1:0] o_reg1_out;
+    // we concat the signals, from bit 0 up to zm (excluded)
+    // and the valid signal (out of the ramMux)
+
+    wire                        i_reg1_clk;
+    wire [`valid_w + `zm_s-1:0] i_reg1_in;
+    wire [`valid_w + `zm_s-1:0] o_reg1_out;
 
     register reg1 (
       //---- input ports ----
@@ -327,25 +332,30 @@ module top (
       .out(o_reg1_out)
     );
     // Define Parameters:
-    defparam reg1.w = `zm_s;
+    defparam reg1.w = 1 + `zm_s;
     // Connect Inputs:
     assign i_reg1_clk = px_clk ;
-    assign i_reg1_in  = o_reg0_out[0 +: `zm_s] ;
+    assign i_reg1_in  = { o_ramMux_valid, o_reg0_out[0 +: `zm_s] } ;
     // ---------------------------------------- //
 
-    // TODO rename these wires (also in GUI)
-    wire [`xc_w-1:0] px_x3        = o_reg1_out[`xc] ;
-    wire [`yc_w-1:0] px_y3        = o_reg1_out[`yc] ;
-    wire [`ab_w-1:0] ab           = o_reg1_out[`ab] ;
-    wire [`fg_w-1:0] fg           = o_reg1_out[`fg] ;
-    wire [`bg_w-1:0] bg           = o_reg1_out[`bg] ;
-    wire [`av_w-1:0] activevideo3 = o_reg1_out[`av] ;
-    assign hsync = o_reg1_out[`hs];
-    assign vsync = o_reg1_out[`vs];
+    wire [`valid_w + `zm_s-1:0] result_stream= o_reg1_out; // we only reference this once, here, easier if we need to modify
+
+    // TODO rename these wires x3, y3, activivideo3 (also in GUI)
+    wire [`xc_w-1:0] px_x3        = result_stream[`xc] ;
+    wire [`yc_w-1:0] px_y3        = result_stream[`yc] ;
+    wire [`ab_w-1:0] ab           = result_stream[`ab] ;
+    wire [`fg_w-1:0] fg           = result_stream[`fg] ;
+    wire [`bg_w-1:0] bg           = result_stream[`bg] ;
+    wire [`av_w-1:0] activevideo3 = result_stream[`av] ;
+    wire             valid        = result_stream[`valid] ;
+
+    // top module outputs
+    assign hsync = result_stream[`hs];
+    assign vsync = result_stream[`vs];
 
     always @(*) begin
         rgb = def_bg; // default background color
-        if ( ab )
+        if ( ab & valid )
           rgb = o_font0_data ? fg : bg;
         // // Debug Draw a border
         // else if (px_y3 <= 0+7 || px_y3 >= 479-7 || px_x3 <= 0+7 || px_x3 >= 639-7 )

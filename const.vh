@@ -71,4 +71,10 @@
 `define vpart1_w 23 // LSB part of the vector, width
 `define vpart2_w 22 // MSB part of the vector, width
 
+
+// HACK... we'll use the in the stream (after reg1)
+`define valid   `zm_s:`zm_s
+`define valid_s `zm_s
+`define valid_w 1
+
 `endif // __CONST_VH__
