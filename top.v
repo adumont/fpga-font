@@ -353,16 +353,28 @@ module top (
     assign hsync = result_stream[`hs];
     assign vsync = result_stream[`vs];
 
-    always @(*) begin
-        rgb = def_bg; // default background color
+    always @(*)
+    begin
+      rgb = `BLACK;
+      if(activevideo3)
+      begin
         if ( ab & valid )
           rgb = o_font0_data ? fg : bg;
         // // Debug Draw a border
-        // else if (px_y3 <= 0+7 || px_y3 >= 479-7 || px_x3 <= 0+7 || px_x3 >= 639-7 )
-        //   rgb = `GREEN;
+        else if (px_y3 <= 0+7 || px_y3 >= 479-7 || px_x3 <= 0+7 || px_x3 >= 639-7 )
+          rgb = `GREEN;
         else
-          rgb = def_bg; // default background color
+          rgb = px_x3[5 +:3]; //def_bg; // px_x3[5 +:3]; // default background color
+      end
+      else
+        // VGA spec, make sure rgb is BLACK (0) when screen not active!
+        rgb = `BLACK;
+      `ifndef SYNTHESIS // SIMULATION
+        // Be sure VGA signal is black (0) when screen not active
+        assert( activevideo3 | rgb == 3'b 000 );
+      `endif
     end
+
 
     wire endframe = ( px_x3 == 639 ) && ( px_y3 == 479 );
 

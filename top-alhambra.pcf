@@ -1,11 +1,27 @@
 set_io   clk               21
 set_io   hsync             37
 set_io   vsync             39
-set_io   rgb[0]            38
+set_io   rgb[2]            38
 set_io   rgb[1]            41
-set_io   rgb[2]            43
+set_io   rgb[0]            43
 set_io   sw1               10
 set_io   sw2               11
+
+# ------------------------- FPGA Direct 3v3 GPIO ------------------------------
+#
+#        -----------------
+#       | GP1 GP3 GP5 GP7 |
+#      >| GP0 GP2 GP4 GP6 |
+#        -----------------
+#
+#set_io --warn-no-port GP0  37
+#set_io --warn-no-port GP1  38
+#set_io --warn-no-port GP2  39
+#set_io --warn-no-port GP3  41
+#set_io --warn-no-port GP4  42
+#set_io --warn-no-port GP5  43
+#set_io --warn-no-port GP6  49
+#set_io --warn-no-port GP7  50
 
 # Debug LEDs.
 set_io   leds[0]           95
