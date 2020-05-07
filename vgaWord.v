@@ -8,7 +8,8 @@ module vgaWord #(
     parameter   pzoom =  `zm_w'b 0,
     parameter   pcolor = `WHITE,
     parameter   width  = 1,
-    parameter   offset = 8'h 0
+    parameter   cs  = `cs_w'd 1,
+    parameter   offset = 5'd 0
   ) (
     // input
     input wire            px_clk,
@@ -43,8 +44,8 @@ module vgaWord #(
   wire [`vpart2_w-1:0] tmp;
 
   assign tmp = {
-      {3'b0, rel_x[2 +:5] }, // addr
-      `cs_w'd1, // chip select
+      {3'b0, rel_x[2 +:5] + offset }, // addr
+      cs, // chip select
       ch2a,
       rel_x[0], // nibble
       pzoom,

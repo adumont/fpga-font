@@ -4,6 +4,7 @@
 // Font addr width: ascii 7 bit
 `define FONT_WIDTH 8
 
+// COLORS
 `define BLACK  3'b 000
 `define BLUE   3'b 001
 `define GREEN  3'b 010

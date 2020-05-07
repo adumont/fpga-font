@@ -21,8 +21,8 @@
     defparam {{name}}.pzoom  = `zm_w'd {{zoom}};
     defparam {{name}}.pcolor = {{fg}};
     defparam {{name}}.width  = {{width}};
-    //defparam {{name}}.offset = `addr_w'd {{offset}};
-    //defparam {{name}}.cs = `cs_w'd {{cs}};
+    defparam {{name}}.offset = 5'd {{offset}};
+    defparam {{name}}.cs = `cs_w'd {{cs}};
     // Connect Inputs:
     assign i_{{name}}_px_clk = {{clk}};
     assign i_{{name}}_in     = {{in}};

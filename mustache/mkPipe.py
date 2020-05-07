@@ -36,7 +36,7 @@ modules_rendered=""
 labels_addr = {}
 addr = 0
 
-with smart_open("Labels.lst", "w") as fh:
+with smart_open("../Labels.lst", "w") as fh:
   for m in data["modules"]:
     if 'label' in m:
       l = m['label']
@@ -63,8 +63,9 @@ for m in data["modules"]:
   if m['type'] == "vgaModule":
     m["width"] = len(m["label"])
     m["offset"] = labels_addr.get(m["label"])
+    if 'cs' not in m: m['cs'] = 0
 
-  # default values if not provided
+  # Other default values if not provided
   if 'clk'  not in m: m['clk' ] = 'px_clk'
   if 'zoom' not in m: m['zoom'] = 0
   if 'fg'   not in m: m['fg'  ] = "`WHITE"
@@ -72,7 +73,6 @@ for m in data["modules"]:
   if 'col'  not in m: m['col' ] = 0
   if 'line' not in m: m['line'] = 0
   if 'offset' not in m: m['offset'] = 0
-  # HACK REMOVE!
   if 'cs' not in m: m['cs'] = 0
   
   m['in']  = wire
@@ -83,5 +83,5 @@ for m in data["modules"]:
 
   wire="o_%s_out" % m['name']
 
-with smart_open("vgaModulesPipe.v", "w") as fh:
+with smart_open("../vgaModulesPipe.v", "w") as fh:
   print(render.render_path( 'vgaModulesPipe.mustache', {"modules":modules_rendered, "pipe_out":wire}), file=fh)

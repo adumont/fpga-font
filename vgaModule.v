@@ -7,7 +7,8 @@ module vgaModule #(
     parameter   pzoom =  `zm_w'b 0,
     parameter   pcolor = `WHITE,
     parameter   width  = 1,
-    parameter   offset = 8'h 0
+    parameter   cs  = `cs_w'd 0,
+    parameter   offset = `addr_w 'h 0
   ) (
     // input
     input wire            px_clk,
@@ -71,7 +72,7 @@ module vgaModule #(
 
   assign tmp = {
       {  {1'b0, rel_x[`xc_w-4:0] } + offset }, // addr
-      `cs_w'd0, // chip select
+      cs, // chip select
       ch2a,
       1'b0, // nibble
       pzoom,
