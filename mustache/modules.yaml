@@ -1,0 +1,19 @@
+---
+modules:
+- type: vgaModule
+  label: HRM
+
+- type: vgaModule
+  label: CPU
+  line: 1
+
+- type: vgaModule
+  label: by @adumont
+  line: 8
+  fg: "`YELLOW"
+
+- name: vgaInbox
+  type: vgaWord
+  line: 1
+  col: 16
+  width: 64

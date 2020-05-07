@@ -1,0 +1,31 @@
+    // ---------------------------------------- //
+    // Module Name: {{name}}
+    // Module Type: vgaModule
+    // Label      : "{{label}}"
+
+    wire           i_{{name}}_px_clk;
+    wire [`stream] i_{{name}}_in;
+    wire           i_{{name}}_en;
+    wire [`stream] o_{{name}}_out;
+
+    vgaModule {{name}} (
+      //---- input ports ----
+      .px_clk(i_{{name}}_px_clk),
+      .in    (i_{{name}}_in    ),
+      .en    (i_{{name}}_en    ),
+      //---- output ports ----
+      .out   (o_{{name}}_out   )
+    );
+    // Define Parameters:
+    defparam {{name}}.line   = {{line}};
+    defparam {{name}}.col    = {{col}};
+    defparam {{name}}.pzoom  = `zm_w'd {{zoom}};
+    defparam {{name}}.pcolor = {{fg}};
+    defparam {{name}}.width  = {{width}};
+    defparam {{name}}.offset = `addr_w'd {{offset}};
+    //defparam {{name}}.cs = `cs_w'd {{cs}};
+    // Connect Inputs:
+    assign i_{{name}}_px_clk = {{clk}};
+    assign i_{{name}}_in     = {{in}};
+    assign i_{{name}}_en     = {{en}};
+    // ---------------------------------------- //
