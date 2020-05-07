@@ -1,7 +1,7 @@
 # call with make MODULE=moduleName sim|svg|upload
 
 include Boards.mk
-BOARD_BUILDDIR:=builddir/$(BOARD)
+BOARD_BUILDDIR:=build/$(BOARD)
 BUILDDIR:=$(BOARD_BUILDDIR)
 
 include Design.mk
