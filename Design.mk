@@ -26,6 +26,7 @@ DEPS_TOP:= \
     ufifo.v \
     rxuartlite.v \
     debouncer.v \
+    vgaModulesPipe.v \
     vga_sync.v
 
 AUXFILES_TOP:= \

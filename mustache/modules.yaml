@@ -2,10 +2,12 @@
 modules:
 - type: vgaModule
   label: HRM
+  zoom: 2
 
 - type: vgaModule
   label: CPU
   line: 1
+  zoom: 2
 
 - type: vgaModule
   label: by @adumont

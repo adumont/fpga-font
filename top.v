@@ -51,144 +51,26 @@ module top (
 
     wire [`stream] vga_str0 = { {`vpart2_w {1'b 0}}, activevideo0, px_y0, px_x0, vsync0, hsync0 };
 
-    // reg [1:0] zoom = 0;
-    // `define ZoomCounter 2
-    // `define ZoomTexto   1
+  // ---------------------------------------- //
+  // vgaPipe (vgaModulesPipe)
+  //
 
-    // // STAGE 1
+  wire           i_vgaPipe_px_clk;
+  wire [`stream] i_vgaPipe_in;
+  wire [`stream] o_vgaPipe_out;
 
-    // // buffer vga signals for 1 clock cycle 
-    // reg [9:0] px_x1, px_y1;
-    // reg [9:0] px_x2, px_y2;
-    // reg [9:0] px_x3, px_y3;
-    // reg hsync1, vsync1, activevideo1;
-    // reg hsync2, vsync2, activevideo2;
-    // reg hsync3, vsync3, activevideo3;
-    // reg [2:0] color2, color3;
+  vgaModulesPipe vgaPipe (
+    //---- input ports ----
+    .px_clk(i_vgaPipe_px_clk),
+    .in    (i_vgaPipe_in    ),
+    //---- output ports ----
+    .out   (o_vgaPipe_out   )
+  );
+  // Connect Inputs:
+  assign i_vgaPipe_px_clk = px_clk ;
+  assign i_vgaPipe_in     = vga_str0 ;
+  // ---------------------------------------- //
 
-    // always @( posedge px_clk) begin
-    //   { hsync1, vsync1, activevideo1, px_x1, px_y1 } <= { hsync0, vsync0, activevideo0, px_x0, px_y0 };
-    //   { hsync2, vsync2, activevideo2, px_x2, px_y2 } <= { hsync1, vsync1, activevideo1, px_x1, px_y1 };
-    //   { hsync3, vsync3, activevideo3, px_x3, px_y3 } <= { hsync2, vsync2, activevideo2, px_x2, px_y2 };
-    //   color3 <= color2;
-    // end
-
-    // ---------------------------------------- //
-    // vgaLabel1 (vgaModule) "HRM"
-    //
-    wire           i_vgaLabel1_px_clk;
-    wire [`stream] i_vgaLabel1_in;
-    wire           i_vgaLabel1_en;
-    wire [`stream] o_vgaLabel1_out;
-
-    vgaModule vgaLabel1 (
-      //---- input ports ----
-      .px_clk(i_vgaLabel1_px_clk),
-      .in    (i_vgaLabel1_in    ),
-      .en    (i_vgaLabel1_en    ),
-      //---- output ports ----
-      .out   (o_vgaLabel1_out   )
-    );
-    // Define Parameters:
-    defparam vgaLabel1.line   = 7'd 0;
-    defparam vgaLabel1.col    = 7'd 0;
-    defparam vgaLabel1.pzoom  = `zm_w'd 2;
-    defparam vgaLabel1.pcolor = `TEAL;
-    defparam vgaLabel1.width  = 3;
-    defparam vgaLabel1.offset = 8'd 0;
-    // Connect Inputs:
-    assign i_vgaLabel1_px_clk = px_clk ;
-    assign i_vgaLabel1_in     = vga_str0;
-    assign i_vgaLabel1_en     = 1'b 1  ;
-    // ---------------------------------------- //
-
-    // ---------------------------------------- //
-    // vgaLabel2 (vgaModule) "CPU"
-    //
-    wire           i_vgaLabel2_px_clk;
-    wire [`stream] i_vgaLabel2_in;
-    wire           i_vgaLabel2_en;
-    wire [`stream] o_vgaLabel2_out;
-
-    vgaModule vgaLabel2 (
-      //---- input ports ----
-      .px_clk(i_vgaLabel2_px_clk),
-      .in    (i_vgaLabel2_in    ),
-      .en    (i_vgaLabel2_en    ),
-      //---- output ports ----
-      .out   (o_vgaLabel2_out   )
-    );
-    // Define Parameters:
-    defparam vgaLabel2.line   = 1;
-    defparam vgaLabel2.col    = 0;
-    defparam vgaLabel2.pzoom  = `zm_w'd 2;
-    defparam vgaLabel2.pcolor = `TEAL;
-    defparam vgaLabel2.width  = 3;
-    defparam vgaLabel2.offset = 8'd 3;
-    // Connect Inputs:
-    assign i_vgaLabel2_px_clk = px_clk ;
-    assign i_vgaLabel2_in     = o_vgaLabel1_out ;
-    assign i_vgaLabel2_en     = 1'b 1 ;
-    // ---------------------------------------- //
-
-    // ---------------------------------------- //
-    // vgaInbox (vgaWord) FIFO INBOX
-    //
-
-    wire           i_vgaInbox_px_clk;
-    wire [`stream] i_vgaInbox_in;
-    wire           i_vgaInbox_en;
-    wire [`stream] o_vgaInbox_out;
-
-    vgaWord vgaInbox (
-      //---- input ports ----
-      .px_clk(i_vgaInbox_px_clk),
-      .in    (i_vgaInbox_in    ),
-      .en    (i_vgaInbox_en    ),
-      //---- output ports ----
-      .out   (o_vgaInbox_out   )
-    );
-    // Define Parameters:
-    defparam vgaInbox.line   = 1;
-    defparam vgaInbox.col    = 16;
-    defparam vgaInbox.pzoom  = `zm_w'd 0;
-    defparam vgaInbox.pcolor = `WHITE;
-    defparam vgaInbox.width  = 64;
-    // Connect Inputs:
-    assign i_vgaInbox_px_clk = px_clk ;
-    assign i_vgaInbox_in     = o_vgaLabel2_out ;
-    assign i_vgaInbox_en     = 1 ;
-    // ---------------------------------------- //
-
-
-    // ---------------------------------------- //
-    // vgaLabel3 (vgaModule) "By @adumont"
-    //
-    wire           i_vgaLabel3_px_clk;
-    wire [`stream] i_vgaLabel3_in;
-    wire           i_vgaLabel3_en;
-    wire [`stream] o_vgaLabel3_out;
-
-    vgaModule vgaLabel3 (
-      //---- input ports ----
-      .px_clk(i_vgaLabel3_px_clk),
-      .in    (i_vgaLabel3_in    ),
-      .en    (i_vgaLabel3_en    ),
-      //---- output ports ----
-      .out   (o_vgaLabel3_out   )
-    );
-    // Define Parameters:
-    defparam vgaLabel3.line   = 8;
-    defparam vgaLabel3.col    = 0;
-    defparam vgaLabel3.pzoom  = `zm_w'b 0;
-    defparam vgaLabel3.pcolor = `YELLOW;
-    defparam vgaLabel3.width  = 11;
-    defparam vgaLabel3.offset = 8'd 6;
-    // Connect Inputs:
-    assign i_vgaLabel3_px_clk = px_clk ;
-    assign i_vgaLabel3_in     = o_vgaInbox_out ;
-    assign i_vgaLabel3_en     = 1 ;
-    // ---------------------------------------- //
 
     // ---------------------------------------- //
     // labelsRam (ram)
@@ -214,7 +96,7 @@ module top (
     defparam labelsRam.ROMFILE = "Labels.lst";
     // Connect Inputs:
     assign i_labelsRam_clk      = px_clk ;
-    assign i_labelsRam_addr     = o_vgaLabel3_out[`addr]; // ADDR
+    assign i_labelsRam_addr     = o_vgaPipe_out[`addr]; // ADDR
     // we don't use write port here...
     assign i_labelsRam_write_en = 1'b 0 ;
     assign i_labelsRam_din      = 8'b 0 ;
@@ -239,7 +121,7 @@ module top (
     defparam reg0.w = `addr_s;
     // Connect Inputs:
     assign i_reg0_clk = px_clk ;
-    assign i_reg0_in  = o_vgaLabel3_out[0 +: `addr_s]; // vga_str0[0 +: `addr_s];
+    assign i_reg0_in  = o_vgaPipe_out[0 +: `addr_s]; // vga_str0[0 +: `addr_s];
     // ---------------------------------------- //
 
 
@@ -339,7 +221,6 @@ module top (
     // ---------------------------------------- //
 
     wire [`valid_w + `zm_s-1:0] result_stream= o_reg1_out; // we only reference this once, here, easier if we need to modify
-    //wire [`valid_w + `zm_s-1:0] result_stream = vga_str0[30:0]; // we only reference this once, here, easier if we need to modify
 
     // TODO rename these wires x3, y3, activivideo3 (also in GUI)
     wire [`xc_w-1:0] px_x3        = result_stream[`xc] ;
@@ -481,7 +362,7 @@ module top (
     assign INBOX_i_rd = sw1_d;
     assign INBOX_i_rst = 0;
     assign INBOX_i_dmp_clk = px_clk;
-    assign INBOX_i_dmp_pos = o_vgaLabel3_out[`addr_s +: 4'd5];
+    assign INBOX_i_dmp_pos = o_vgaPipe_out[`addr_s +: 4'd5];
     // ---------------------------------------- //
 
     assign TX=RX; // UART Loopback
