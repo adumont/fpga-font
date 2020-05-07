@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
 labels = [
-  "A label:",
-  "Another Label:",
-  "HrmCPU",
-  "A CPU designed in Verilog",
-  "Author:",
-  "@adumont",
-  "Frame:"
+  "HRM",
+  "CPU",
+  "By @adumont",
+  "IN:",
+  "OUT:",
 ]
 
 addr = 0
