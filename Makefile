@@ -22,7 +22,7 @@ endif
 
 NEXTPNR   = $(DOCKER) $(DOCKERARGS) ghdl/synth:nextpnr-ice40 nextpnr-ice40
 
-BUILDDIR?=builddir/$(BOARD)
+BUILDDIR?=build/$(BOARD)
 ARACHNE_SEED?=36747270
 
 all: bin svg dot sim
@@ -34,6 +34,7 @@ json: $(BUILDDIR)/$(MODULE)-netlist.json
 svg: assets/$(MODULE).svg
 dot: assets/$(MODULE)_dot.svg
 lint: $(BOARD_BUILDDIR)/$(MODULE).lint
+pipe: Labels.lst vgaModulesPipe.v
 
 # @echo '@: $@' # file name of the target
 # @echo '%: $%' # name of the archive member-$(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).blif
@@ -125,6 +126,9 @@ assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
+Labels.lst vgaModulesPipe.v: mustache/*
+	cd mustache && ./mkPipe.py
+
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
 $(BOARD_BUILDDIR)/build.config: $(AUXFILES) $(BUILDDIR) .force
 	@echo '$(AUXFILES)' | cmp -s - $@ || echo '$(AUXFILES)' > $@
@@ -139,6 +143,6 @@ test:
 	$(MAKE) -C test all
 
 clean:
-	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM)
+	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM) Labels.lst vgaModulesPipe.v
 
 .PHONY: all clean json vcd svg bin sim dot .force test upload lint
