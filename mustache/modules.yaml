@@ -14,9 +14,29 @@ modules:
   line: 8
   fg: "`YELLOW"
 
-- name: vgaInbox
+- type: vgaModule
+  label: Inbox
+  line: 0
+  col: 12
+  fg: "`YELLOW"
+
+- type: vgaModule
+  label: Outbx
+  line: 5
+  col: 12
+  fg: "`YELLOW"
+
+- name: vgaInbox0
   type: vgaWord
   line: 1
   col: 16
   width: 64
   cs: 1
+
+- name: vgaInbox1
+  type: vgaWord
+  line: 3
+  col: 16
+  width: 64
+  cs: 1
+  offset: 16
