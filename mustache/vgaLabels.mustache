@@ -40,7 +40,7 @@ module vgaLabels (
   reg [`bg_w  -1:0] bg;
   reg [`zm_w  -1:0] zm;
   reg [`addr_w-1:0] offset; // position in rom
-  reg [`xc_w  -4:0] rel_x;  // relative position in the label
+  reg [`xc_w  -4:0] col;
 
   always @(*)
   begin
@@ -50,7 +50,7 @@ module vgaLabels (
     bg = `BLACK;
     zm = `zm_w'd 0;
     offset = `addr_w'd 0;
-    rel_x = 0;
+    col = 0;
     
 {{#labels}}
     // Label : {{label}}
@@ -62,11 +62,13 @@ module vgaLabels (
       bg = {{bg}};
       zm = `zm_w'd {{zoom}};
       offset = `addr_w'd {{offset}};
-      rel_x = ( char_x >> {{zoom}} ) - {{col}};
+      col={{col}};
     end
 
 {{/labels}}
   end
+
+  wire [`xc_w-4:0] rel_x = ( char_x >> zm ) - col;  // relative position in the label
 
   wire [`vpart2_w-1:0] tmp;
 
