@@ -126,7 +126,7 @@ assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
-Labels.lst vgaModulesPipe.v: mustache/*
+Labels.lst vgaModulesPipe.v vgaLabels.v: mustache/*
 	cd mustache && ./mkPipe.py
 
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
@@ -143,6 +143,6 @@ test:
 	$(MAKE) -C test all
 
 clean:
-	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM) Labels.lst vgaModulesPipe.v
+	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM) Labels.lst vgaModulesPipe.v vgaLabels.v
 
 .PHONY: all clean json vcd svg bin sim dot .force test upload lint

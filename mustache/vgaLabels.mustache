@@ -1,0 +1,93 @@
+`default_nettype none
+`include "const.vh"
+
+module vgaLabels (
+    // input
+    input wire            px_clk,
+    input wire  [`stream] in, // input stream
+    // input wire            en, // enabled
+    // output
+    output reg  [`stream] out // output stream
+  );
+  
+  // this component needs tranlation, 0 or 1.
+  localparam ch2a = 1'b 0;
+
+  wire [`xc_w-1:0] x = in[ `xc_s +: `xc_w ];
+  wire [`yc_w-1:0] y = in[ `yc_s +: `yc_w ];
+
+  wire [`xc_w-4:0] char_x = x[3 +: `xc_w-3];
+  wire [`yc_w-4:0] char_y = y[3 +: `yc_w-3];
+
+  /* verilator lint_off UNSIGNED */
+  /* verilator lint_on UNSIGNED */
+  function automatic is_active;
+    input [`xc_w-4:0] col;
+    input [`yc_w-4:0] line;
+    input [`xc_w-4:0] width;
+    input [`zm_w-1:0] zm;
+
+    begin
+      is_active = ( (char_x >> zm ) >= ( col          ) )
+               && ( (char_x >> zm )  < ( col  + width ) )
+               && ( (char_y >> zm ) == ( line         ) );
+    end
+  endfunction
+
+  reg active;
+  reg [`cs_w  -1:0] cs;
+  reg [`fg_w  -1:0] fg;
+  reg [`bg_w  -1:0] bg;
+  reg [`zm_w  -1:0] zm;
+  reg [`addr_w-1:0] offset; // position in rom
+  reg [`xc_w  -4:0] rel_x;  // relative position in the label
+
+  always @(*)
+  begin
+    active=1'b 0;
+    cs = `cs_w'd 0;
+    fg = `BLACK;
+    bg = `BLACK;
+    zm = `zm_w'd 0;
+    offset = `addr_w'd 0;
+    rel_x = 0;
+    
+{{#labels}}
+    // Label : {{label}}
+    if ( is_active({{col}}, {{line}}, {{width}}, {{zoom}}) ) 
+    begin
+      active=1'b 1;
+      cs = `cs_w'd {{cs}};
+      fg = {{fg}};
+      bg = {{bg}};
+      zm = `zm_w'd {{zoom}};
+      offset = `addr_w'd {{offset}};
+      rel_x = ( char_x >> {{zoom}} ) - {{col}};
+    end
+
+{{/labels}}
+  end
+
+  wire [`vpart2_w-1:0] tmp;
+
+  assign tmp = {
+      {  {1'b0, rel_x[`xc_w-4:0] } + offset }, // addr
+      cs,
+      1'b 0, // h2a
+      1'b 0, // nibble
+      zm,
+      bg,
+      fg,
+      active
+     };
+
+  always @(posedge px_clk)
+  begin
+    out[`vpart1] <= in[`vpart1];
+    if(active)
+      out[`vpart2] <= in[`vpart2] | tmp ;
+    else
+      out[`vpart2] <= in[`vpart2];
+  end
+
+endmodule

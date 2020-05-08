@@ -21,11 +21,11 @@ DEPS_TOP:= \
     hex2asc.v \
     register.v \
     ram.v \
-    vgaModule.v \
     vgaWord.v \
     ufifo.v \
     rxuartlite.v \
     debouncer.v \
+    vgaLabels.v \
     vgaModulesPipe.v \
     vga_sync.v
 

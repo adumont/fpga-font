@@ -8,7 +8,7 @@ include $(RTL_DIR)/Design.mk
 
 RTL_DEPS := $(addprefix $(RTL_DIR)/, $(DEPS))
 
-RTL_PIPE := $(addprefix $(RTL_DIR)/, Labels.lst vgaModulesPipe.v)
+RTL_PIPE := $(addprefix $(RTL_DIR)/, Labels.lst vgaModulesPipe.v vgaLabels.v)
 
 .DEFAULT_GOAL := $(PROJECT)
 
@@ -16,7 +16,7 @@ VLIBS := verilated.o verilated_save.o verilated_vcd_c.o
 VOBJS := $(addprefix $(RTL_DIR)/obj_dir/, $(VLIBS) V$(RTL_TOP)__ALLcls.o V$(RTL_TOP)__ALLsup.o )
 
 $(RTL_PIPE): .FORCE
-	make -C .. Labels.lst vgaModulesPipe.v
+	make -C .. Labels.lst vgaModulesPipe.v vgaLabels.v
 
 verilator: $(VOBJS) $(RTL_DEPS)
 

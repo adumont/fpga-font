@@ -36,34 +36,46 @@ modules_rendered=""
 labels_addr = {}
 addr = 0
 
+# Generate Label Rom file with all labels
 with smart_open("../Labels.lst", "w") as fh:
-  for m in data["modules"]:
-    if 'label' in m:
-      l = m['label']
-      if l in labels_addr:
-        continue # found, skip
+  for l in data["labels"]:
+    s = l['label']
+    w = len(s)
 
-      w = len(l)
+    l["width"] = w
+    if 'cs'     not in l: l['cs'    ] = 0
+    if 'zoom'   not in l: l['zoom'  ] = 0
+    if 'fg'     not in l: l['fg'    ] = "`WHITE"
+    if 'bg'     not in l: l['bg'    ] = "`BLACK"
+    if 'col'    not in l: l['col'   ] = 0
+    if 'line'   not in l: l['line'  ] = 0
+    if 'offset' not in l: l['offset'] = 0
 
-      print("// Addr: %d Width: %d" % (addr, w), file=fh)
-      print("// \"%s\"" % l, file=fh)
-      print(''.join('%02x ' % ord(a) for a in l ), file=fh)
-      print("", file=fh)
+    if s in labels_addr:
+      l["offset"] = labels_addr.get(s)
+      continue # found, skip
 
-      labels_addr[l]=addr
-      addr = addr + w
+    l["offset"] = addr
 
+    print("// Addr: %d Width: %d" % (addr, w), file=fh)
+    print("// \"%s\"" % s, file=fh)
+    print(''.join('%02x ' % ord(a) for a in s ), file=fh)
+    print("", file=fh)
+
+    labels_addr[s]=addr
+    addr = addr + w
+
+with smart_open("../vgaLabels.v", "w") as fh:
+  print(render.render_path( 'vgaLabels.mustache', data), file=fh )
+
+
+# Generate vgaPipe with Modules instanciation
 for m in data["modules"]:
   if 'name' not in m:
     if m['type'] not in indexByType:
       indexByType[m['type']]=0
     m['name']=m['type'] + str(indexByType[m['type']])
     indexByType[m['type']]=indexByType[m['type']]+1
-
-  if m['type'] == "vgaModule":
-    m["width"] = len(m["label"])
-    m["offset"] = labels_addr.get(m["label"])
-    if 'cs' not in m: m['cs'] = 0
 
   # Other default values if not provided
   if 'clk'  not in m: m['clk' ] = 'px_clk'
@@ -77,7 +89,7 @@ for m in data["modules"]:
   
   m['in']  = wire
 
-  this_module = render.render_path( m['type']+'.mustache', m)
+  this_module = render.render_path( m['type']+'_inst.mustache', m)
 
   modules_rendered = "%s\n%s" % (modules_rendered, this_module)
 

@@ -19,8 +19,6 @@ module vgaWord #(
     output reg  [`stream] out // output stream
   );
   
-  // `include "functions.vh"
-
   // this component needs tranlation, 0 or 1.
   localparam ch2a = 1'b 1;
 

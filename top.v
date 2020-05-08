@@ -51,25 +51,25 @@ module top (
 
     wire [`stream] vga_str0 = { {`vpart2_w {1'b 0}}, activevideo0, px_y0, px_x0, vsync0, hsync0 };
 
-  // ---------------------------------------- //
-  // vgaPipe (vgaModulesPipe)
-  //
+    // ---------------------------------------- //
+    // vgaPipe (vgaModulesPipe)
+    //
 
-  wire           i_vgaPipe_px_clk;
-  wire [`stream] i_vgaPipe_in;
-  wire [`stream] o_vgaPipe_out;
+    wire           i_vgaPipe_px_clk;
+    wire [`stream] i_vgaPipe_in;
+    wire [`stream] o_vgaPipe_out;
 
-  vgaModulesPipe vgaPipe (
-    //---- input ports ----
-    .px_clk(i_vgaPipe_px_clk),
-    .in    (i_vgaPipe_in    ),
-    //---- output ports ----
-    .out   (o_vgaPipe_out   )
-  );
-  // Connect Inputs:
-  assign i_vgaPipe_px_clk = px_clk ;
-  assign i_vgaPipe_in     = vga_str0 ;
-  // ---------------------------------------- //
+    vgaModulesPipe vgaPipe (
+      //---- input ports ----
+      .px_clk(i_vgaPipe_px_clk),
+      .in    (i_vgaPipe_in    ),
+      //---- output ports ----
+      .out   (o_vgaPipe_out   )
+    );
+    // Connect Inputs:
+    assign i_vgaPipe_px_clk = px_clk ;
+    assign i_vgaPipe_in     = vga_str0 ;
+    // ---------------------------------------- //
 
 
     // ---------------------------------------- //
