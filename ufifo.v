@@ -1,3 +1,6 @@
+`ifndef __UFIFO_V__
+`define __UFIFO_V__
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Filename: 	ufifo.v
@@ -385,3 +388,4 @@ module ufifo(i_clk, i_rst, i_wr, i_data, o_empty_n, o_full, i_rd, o_data, o_stat
 
 `endif
 endmodule
+`endif // __UFIFO_V__

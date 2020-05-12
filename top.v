@@ -1,6 +1,17 @@
+`ifndef __TOP_V__
+`define __TOP_V__
+
 `default_nettype none
 `include "const.vh"
-
+`include "vgaModulesPipe.v"
+`include "debouncer.v"
+`include "vga_sync.v"
+`include "ram.v"
+`include "register.v"
+`include "hex2asc.v"
+`include "rxuartlite.v"
+`include "font.v"
+`include "ufifo.v"
 // check connections to VGA adapter on https://github.com/Obijuan/MonsterLED/wiki
 
 module top (
@@ -369,3 +380,4 @@ module top (
 
 endmodule
 
+`endif // __TOP_V__

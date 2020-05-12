@@ -6,6 +6,31 @@ BUILDDIR:=$(BOARD_BUILDDIR)
 
 include Design.mk
 
+# load dependencies if exists
+-include $(MODULE).v.d
+
+%.v.d: %.v $(DEPS) $(MUSTACHE_GENERATED)
+	$(warning Building $@)
+	$(YOSYS) -q -E $@.tmp $<
+	sed 's/:/DEPS:=/g' < $@.tmp > $@
+	rm $@.tmp
+
+.v.d:
+	@true
+
+FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
+
+# From dependencies, here we keep only .v files (excluding .vh)
+SOURCES_V:=$(call FILTER_OUT,.vh, $(DEPS))
+
+all_svg: $(addprefix assets/, $(SOURCES_V:.v=.svg)) $(addprefix assets/, $(SOURCES_V:.v=_dot.svg))
+
+assets/%.svg:
+	make MODULE=$* svg || true
+
+assets/%_dot.svg:
+	make MODULE=$* svg || true
+
 # Use Docker images
 DOCKER=docker
 #DOCKER=podman
@@ -35,9 +60,10 @@ svg: assets/$(MODULE).svg
 dot: assets/$(MODULE)_dot.svg
 lint: $(BOARD_BUILDDIR)/$(MODULE).lint
 pipe: Labels.lst vgaModulesPipe.v
+deps: $(MODULE).v.d
 
 # @echo '@: $@' # file name of the target
-# @echo '%: $%' # name of the archive member-$(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).blif
+# @echo '%: $%' # name of the archive member
 
 # @echo '<: $<' # name of the first prerequisite
 # @echo '?: $?' # names of all prerequisites newer than the target
@@ -60,7 +86,7 @@ $(MODULE)_tb.vcd: $(MODULE).v $(DEPS) $(MODULE)_tb.v $(PROGRAM) $(ROMFILE)
 	iverilog $(MODULE).v $(DEPS) $(MODULE)_tb.v $(IVERILOG_MACRO) -o $(MODULE)_tb.out
 	./$(MODULE)_tb.out
 
-$(BOARD_BUILDDIR)/$(MODULE).lint: $(MODULE).v $(DEPS) $(BUILDDIR)
+$(BOARD_BUILDDIR)/$(MODULE).lint: $(MODULE).v $(DEPS) | $(BUILDDIR)
 
 	verilator --lint-only $(MODULE).v && > $@ || ( rm -f $@; false )
 
@@ -68,15 +94,15 @@ gtkwave: $(MODULE).v $(DEPS) $(MODULE)_tb.v $(MODULE)_tb.vcd
 
 	gtkwave $(MODULE)_tb.vcd $(MODULE)_tb.gtkw &
 
-$(BOARD_BUILDDIR)/$(MODULE).json: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config
+$(BOARD_BUILDDIR)/$(MODULE).json: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config | $(BUILDDIR)
 	
 	$(YOSYS) -p "synth_ice40 -top $(MODULE) -json $(BOARD_BUILDDIR)/$(MODULE).json $(YOSYSOPT)" \
-              -l $(BUILDDIR)/$(MODULE).log -q $(DEPS) $(MODULE).v
+              -l $(BUILDDIR)/$(MODULE).log -q $(MODULE).v
 
-$(BOARD_BUILDDIR)/$(MODULE).blif: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config
+$(BOARD_BUILDDIR)/$(MODULE).blif: $(MODULE).v $(DEPS) $(AUXFILES) $(BOARD_BUILDDIR)/build.config | $(BUILDDIR)
 	
 	$(YOSYS) -p "synth_ice40 -top $(MODULE) -blif $(BOARD_BUILDDIR)/$(MODULE).blif $(YOSYSOPT)" \
-              -l $(BUILDDIR)/$(MODULE).log -q $(DEPS) $(MODULE).v
+              -l $(BUILDDIR)/$(MODULE).log -q $(MODULE).v
 
 # set ARACHNEPNR=1 to force arachne-pnr
 ifneq ($(ARACHNEPNR),)
@@ -92,10 +118,9 @@ $(BOARD_BUILDDIR)/$(MODULE).pnr: $(PCF) $(BOARD_BUILDDIR)/$(MODULE).json
 	$(NEXTPNR) --hx$(PNRDEV) --package $(PNRPACK) --json $(BOARD_BUILDDIR)/$(MODULE).json --pcf $(PCF) --asc $@
 endif
 
-
 ifdef LEVEL
 $( warning LEVEL=$(LEVEL))
-$(BUILDDIR)/$(MODULE).pnr: $(BOARD_BUILDDIR)/$(MODULE).pnr $(PROGRAM) $(ROMFILE)
+$(BUILDDIR)/$(MODULE).pnr: $(BOARD_BUILDDIR)/$(MODULE).pnr $(PROGRAM) $(ROMFILE) | $(BUILDDIR)
 
 	icebram dummy_prg.hex $(PROGRAM) < $(BOARD_BUILDDIR)/$(MODULE).pnr > $(BUILDDIR)/$(MODULE)-tmp.pnr && \
 	icebram dummy_ram.hex $(ROMFILE) < $(BUILDDIR)/$(MODULE)-tmp.pnr > $(BUILDDIR)/$(MODULE).pnr && \
@@ -112,25 +137,29 @@ upload: $(BUILDDIR)/$(MODULE).bin
 	( echo "INFO: FPGA $(BOARD) bitstream hasn't changed: Skipping programming and reseting board:" ; iceprog -t ) || \
 	( iceprog $(BUILDDIR)/$(MODULE).bin && md5sum $(BUILDDIR)/$(MODULE).bin > $(BOARD_BUILDDIR)/flashed.md5 || rm $(BOARD_BUILDDIR)/flashed.md5 )
 
-$(BUILDDIR)/$(MODULE)-netlist.json: $(MODULE).v $(DEPS)
+$(BUILDDIR)/$(MODULE)-netlist.json: $(MODULE).v $(DEPS) | $(BUILDDIR)
 
-	yosys -p "prep -top $(MODULE); write_json $(BUILDDIR)/$(MODULE)-netlist.json" $(MODULE).v $(DEPS)
+	yosys -p "prep -top $(MODULE); write_json $(BUILDDIR)/$(MODULE)-netlist.json" $(MODULE).v
 
-assets/$(MODULE).svg: $(BUILDDIR)/$(MODULE)-netlist.json
+$(BUILDDIR)/$(MODULE)-netlist-svg.json: $(MODULE).v $(DEPS) | $(BUILDDIR)
 
-	netlistsvg $(BUILDDIR)/$(MODULE)-netlist.json -o assets/$(MODULE).svg && rm $(MODULE).json
+	yosys -DYOSYS_PLOT -p "prep -top $(MODULE); write_json -compat-int $(BUILDDIR)/$(MODULE)-netlist.json" $(MODULE).v
+
+assets/$(MODULE).svg: $(BUILDDIR)/$(MODULE)-netlist-svg.json $(DEPS)
+
+	netlistsvg $(BUILDDIR)/$(MODULE)-netlist.json -o assets/$(MODULE).svg
 
 assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 
-	$(YOSYS) -p "read_verilog $(MODULE).v $(DEPS); hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
+	$(YOSYS) -DYOSYS_PLOT -p "read_verilog $(MODULE).v; hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
-Labels.lst vgaModulesPipe.v vgaLabels.v: mustache/*
+$(MUSTACHE_GENERATED): $(wildcard mustache/*.mustache)
 	cd mustache && ./mkPipe.py
 
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
-$(BOARD_BUILDDIR)/build.config: $(AUXFILES) $(BUILDDIR) .force
+$(BOARD_BUILDDIR)/build.config: $(AUXFILES) .force | $(BUILDDIR)
 	@echo '$(AUXFILES)' | cmp -s - $@ || echo '$(AUXFILES)' > $@
 
 $(BUILDDIR):
@@ -143,6 +172,6 @@ test:
 	$(MAKE) -C test all
 
 clean:
-	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM) Labels.lst vgaModulesPipe.v vgaLabels.v
+	rm -rf $(BOARD_BUILDDIR) $(BUILDDIR) $(CLEAN_PROGRAM) $(MUSTACHE_GENERATED) *.v.d
 
 .PHONY: all clean json vcd svg bin sim dot .force test upload lint

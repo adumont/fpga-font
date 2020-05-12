@@ -1,5 +1,9 @@
+`ifndef __FONT_V__
+`define __FONT_V__
+
 `default_nettype none
 `include "const.vh"
+`include "ram.v"
 
 module font (
         input  wire       px_clk,      // Pixel clock.
@@ -56,3 +60,4 @@ module font (
     assign data = o_fontRom_dout[r_col];
     
 endmodule
+`endif // __FONT_V__

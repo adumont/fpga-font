@@ -1,3 +1,6 @@
+`ifndef __VGAWORD_V__
+`define __VGAWORD_V__
+
 `default_nettype none
 `include "const.vh"
 
@@ -62,3 +65,4 @@ module vgaWord #(
   end
 
 endmodule
+`endif // __VGAWORD_V__

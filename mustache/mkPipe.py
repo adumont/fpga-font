@@ -96,4 +96,4 @@ for m in data["modules"]:
   wire="o_%s_out" % m['name']
 
 with smart_open("../vgaModulesPipe.v", "w") as fh:
-  print(render.render_path( 'vgaModulesPipe.mustache', {"modules":modules_rendered, "pipe_out":wire}), file=fh)
+  print(render.render_path( 'vgaModulesPipe.mustache', {"modules_rendered":modules_rendered, "pipe_out":wire}, data), file=fh)

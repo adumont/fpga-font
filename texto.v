@@ -1,3 +1,6 @@
+`ifndef __TEXTO_V__
+`define __TEXTO_V__
+
 `default_nettype none
 `include "const.vh"
 
@@ -18,3 +21,4 @@ module texto(index, ascii_code);
         endcase
     end
 endmodule
+`endif // __TEXTO_V__

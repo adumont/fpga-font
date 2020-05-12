@@ -1,3 +1,6 @@
+`ifndef __DIVM_V__
+`define __DIVM_V__
+
 //-----------------------------------------------------------------------------
 //-- Divisor de frecuencia entre M
 //-- (c) BQ. August 2015. written by Juan Gonzalez (obijuan)
@@ -37,3 +40,4 @@ assign clk_out = divcounter[N-1];
 
 endmodule
 
+`endif // __DIVM_V__

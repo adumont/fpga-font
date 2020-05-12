@@ -1,3 +1,6 @@
+`ifndef __INIT_V__
+`define __INIT_V__
+
 //-- init.v  (version optimizada)
 module init(input wire clk, output reg ini);
     //-- Registro de 1 bit inicializa a 0 (solo para simulacion)
@@ -10,3 +13,4 @@ module init(input wire clk, output reg ini);
         ini <= 1;
 
 endmodule
+`endif // __INIT_V__

@@ -1,3 +1,7 @@
+`ifndef __VGAREGISTER_V__
+`define __VGAREGISTER_V__
+
+
 `default_nettype none
 `include "const.vh"
 
@@ -72,3 +76,4 @@ module vgaRegister #(
   end
 
 endmodule
+`endif // __VGAREGISTER_V__

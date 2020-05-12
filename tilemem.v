@@ -1,3 +1,6 @@
+`ifndef __TILEMEM_V__
+`define __TILEMEM_V__
+
 `default_nettype none
 `include "const.vh"
 
@@ -36,3 +39,4 @@ module tilemem #(
     end
 
 endmodule
+`endif // __TILEMEM_V__

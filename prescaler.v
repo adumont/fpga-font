@@ -1,3 +1,6 @@
+`ifndef __PRESCALER_V__
+`define __PRESCALER_V__
+
 //-------------------------------------------------------------
 //-- Prescaler de N bits
 //-- (C) BQ. August 2015. Written by Juan Gonzalez (obijuan)
@@ -26,3 +29,4 @@ module prescaler(input wire clk_in, output wire clk_out);
   end
 
 endmodule
+`endif // __PRESCALER_V__

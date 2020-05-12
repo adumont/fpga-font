@@ -18,6 +18,9 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
+`ifndef __VGA_SYNC_V__
+`define __VGA_SYNC_V__
+
 module vga_sync (
             // inputs
             input wire       clk,           // Input clock: 12MHz
@@ -56,21 +59,25 @@ module vga_sync (
     // SIMULATION
         assign px_clk = clk;
     `else
-    // SYNTHESIS
-        SB_PLL40_CORE #(.FEEDBACK_PATH("SIMPLE"),
+        `ifdef YOSYS_PLOT
+            // SVG/DOT
+            assign px_clk = clk;
+        `else
+            // SYNTHESIS
+            SB_PLL40_CORE #(.FEEDBACK_PATH("SIMPLE"),
                         .PLLOUT_SELECT("GENCLK"),
                         .DIVR(4'b0000),
                         .DIVF(7'b1010011),
                         .DIVQ(3'b101),
                         .FILTER_RANGE(3'b001)
-                )
-                uut
-                (
+            )
+            uut (
                         .REFERENCECLK(clk),
                         .PLLOUTCORE(px_clk),
                         .RESETB(1'b1),
                         .BYPASS(1'b0)
-                    );
+            );
+        `endif
     `endif
 
     /*
@@ -157,3 +164,4 @@ module vga_sync (
         end
      end
  endmodule
+`endif // __VGA_SYNC_V__

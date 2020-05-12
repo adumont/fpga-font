@@ -1,3 +1,6 @@
+`ifndef __VGAMODULEDEBUG_V__
+`define __VGAMODULEDEBUG_V__
+
 // Stream in
 
 wire [`hs_w-1:0] in_hs = in[`hs];
@@ -29,3 +32,4 @@ wire [`nb_w-1:0] out_nb = out[`nb];
 wire [`ha_w-1:0] out_ha = out[`ha];
 wire [`cs_w-1:0] out_cs = out[`cs];
 wire [`addr_w-1:0] out_addr = out[`addr];
+`endif // __VGAMODULEDEBUG_V__

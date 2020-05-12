@@ -1,3 +1,6 @@
+`ifndef __RXUARTLITE_V__
+`define __RXUARTLITE_V__
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Filename: 	rxuartlite.v
@@ -188,4 +191,4 @@ module rxuartlite(i_clk, i_uart_rx, o_wr, o_data);
 
 endmodule
 
-
+`endif // __RXUARTLITE_V__

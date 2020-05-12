@@ -1,3 +1,6 @@
+`ifndef __HEX2ASC_V__
+`define __HEX2ASC_V__
+
 `default_nettype none
 `include "const.vh"
 
@@ -36,3 +39,4 @@ module hex2asc(
     end
   end
 endmodule
+`endif // __HEX2ASC_V__

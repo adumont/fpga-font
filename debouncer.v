@@ -1,3 +1,6 @@
+`ifndef __DEBOUNCER_V__
+`define __DEBOUNCER_V__
+
 `default_nettype none
 
 module debouncer(
@@ -35,3 +38,4 @@ end
 assign PB_up   = ~PB_idle & PB_cnt_max & ~PB_state;
 assign PB_down = ~PB_idle & PB_cnt_max &  PB_state;
 endmodule
+`endif // __DEBOUNCER_V__
