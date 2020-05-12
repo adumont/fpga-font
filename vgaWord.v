@@ -6,7 +6,7 @@
 
 module vgaWord #(
     // "derives" vgaModule
-    parameter   line =  7'd 0,  // position of the component on screen (vertical)
+    parameter   line =  6'd 0,  // position of the component on screen (vertical)
     parameter   col  =  7'd 0,  // position of the component on screen (horizontal)
     parameter   pzoom =  `zm_w'b 0,
     parameter   pcolor = `WHITE,
@@ -37,10 +37,10 @@ module vgaWord #(
   wire active = en && rel_x[1] 
       && ( (x[3 +: `xc_w-3] >> pzoom ) >= ( col          ) )
       && ( (x[3 +: `xc_w-3] >> pzoom )  < ( col  + width ) )
-      && ( (y[3 +: `yc_w-3] >> pzoom ) == ( line         ) );
+      && ( (y[4 +: `yc_w-4] >> pzoom ) == ( line         ) );
   /* verilator lint_on UNSIGNED */
 
-  wire [`xc_w-4:0] rel_x = ( x[3 +: `xc_w-3] >> pzoom ) - col ;  // relative position in the block
+  wire [`xc_w-3-1:0] rel_x = ( x[3 +: `xc_w-3] >> pzoom ) - col ;  // relative position in the block
 
   wire [`vpart2_w-1:0] tmp;
 

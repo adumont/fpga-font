@@ -2,7 +2,7 @@
 `define __CONST_VH__
 
 // Font addr width: ascii 7 bit
-`define FONT_WIDTH 8
+`define FONT_WIDTH 9
 
 // COLORS
 `define BLACK  3'b 000

@@ -20,13 +20,13 @@ module vgaLabels (
   wire [`yc_w-1:0] y = in[ `yc_s +: `yc_w ];
 
   wire [`xc_w-4:0] char_x = x[3 +: `xc_w-3];
-  wire [`yc_w-4:0] char_y = y[3 +: `yc_w-3];
+  wire [`yc_w-5:0] char_y = y[4 +: `yc_w-4];
 
   /* verilator lint_off UNSIGNED */
   /* verilator lint_on UNSIGNED */
   function automatic is_active;
     input [`xc_w-4:0] col;
-    input [`yc_w-4:0] line;
+    input [`yc_w-5:0] line;
     input [`xc_w-4:0] width;
     input [`zm_w-1:0] zm;
 

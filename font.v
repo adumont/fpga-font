@@ -18,7 +18,7 @@ module font (
     wire [(`FONT_WIDTH-1)+3:0] row;
     wire [2:0] col;
 
-    assign row =  { character, pos_y[2:0] }; // which row in the FONT rom?
+    assign row =  { character, pos_y[3:0] }; // which row in the FONT rom?
     assign col =  ~ pos_x[2:0];
 
     reg [2:0] r_col;
@@ -32,7 +32,7 @@ module font (
     //
 
     wire          i_fontRom_clk;
-    wire [11-1:0] i_fontRom_addr;
+    wire [12-1:0] i_fontRom_addr;
     wire          i_fontRom_write_en;
     wire  [8-1:0] i_fontRom_din;
     wire  [8-1:0] o_fontRom_dout;
@@ -47,7 +47,7 @@ module font (
     .dout    (o_fontRom_dout    )
     );
     // Define Parameters:
-    defparam fontRom.addr_width = 11; // 16*16*8 = 2^11
+    defparam fontRom.addr_width = 12; // 16*16*16 = 2^12
     defparam fontRom.data_width =  8; 
     defparam fontRom.ROMFILE = FILE_FONT;
     // Connect Inputs:
