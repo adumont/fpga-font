@@ -9,8 +9,6 @@ include Design.mk
 # load dependencies if exists
 -include $(MODULE).v.d
 
-clean: CLEAN=1
-
 %.v.d: %.v $(DEPS) $(MUSTACHE_GENERATED)
 	$(warning Building $@)
 	$(YOSYS) -q -E $@.tmp $<
@@ -157,10 +155,8 @@ assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
-ifneq ($(CLEAN),)
 $(MUSTACHE_GENERATED): $(wildcard mustache/*.mustache)
 	cd mustache && ./mkPipe.py
-endif
 
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
 $(BOARD_BUILDDIR)/build.config: $(AUXFILES) .force | $(BUILDDIR)
