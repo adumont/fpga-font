@@ -10,6 +10,7 @@ include Design.mk
 -include $(MODULE).v.d
 
 %.v.d: %.v $(DEPS) $(MUSTACHE_GENERATED)
+	@echo Generating dependencies file $@
 	$(YOSYS) -q -E $@.tmp $<
 	sed 's/:/DEPS:=/g' < $@.tmp > $@
 	rm $@.tmp
@@ -22,13 +23,14 @@ FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
 # From dependencies, here we keep only .v files (excluding .vh)
 SOURCES_V:=$(call FILTER_OUT,.vh, $(DEPS))
 
-all_svg: $(addprefix assets/, $(SOURCES_V:.v=.svg)) $(addprefix assets/, $(SOURCES_V:.v=_dot.svg))
+diagrams: $(addprefix assets/, $(SOURCES_V:.v=.svg)) top.v.d # $(addprefix assets/, $(SOURCES_V:.v=_dot.svg))
+	cd mustache; ./mkDiagrams.py
 
 assets/%.svg:
-	make MODULE=$* svg || true
+	make MODULE=$* svg
 
 assets/%_dot.svg:
-	make MODULE=$* svg || true
+	make MODULE=$* dot
 
 # Use Docker images
 DOCKER=docker
@@ -151,11 +153,12 @@ assets/$(MODULE).svg: $(BUILDDIR)/$(MODULE)-netlist-svg.json $(DEPS)
 
 assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 
-	$(YOSYS) -DYOSYS_PLOT -p "read_verilog $(MODULE).v; hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
+	$(YOSYS) -DYOSYS_PLOT -q -p "read_verilog $(MODULE).v; hierarchy -check; proc; opt; fsm; opt; memory; opt; clean; stat; show -colors 1 -format svg -stretch -prefix $(MODULE)_dot $(MODULE);"
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
 $(MUSTACHE_GENERATED): $(wildcard mustache/*.mustache) mustache/modules.yaml
+	@echo Generating mustache $@
 	cd mustache && ./mkPipe.py
 
 # We save AUXFILES names to build.config. Force a rebuild if they have changed
