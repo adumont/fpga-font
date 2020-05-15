@@ -14,6 +14,7 @@ module vgaModulesPipe #(
   ) (
     input  wire           px_clk,
     input  wire [`stream] in, // input stream
+    input wire  [{{extw}}-1:0] en, // external signals to enable/disable labels
 
     output wire [`stream] out // output stream
   );

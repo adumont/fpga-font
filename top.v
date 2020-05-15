@@ -74,18 +74,21 @@ module top (
 
     wire           i_vgaPipe_px_clk;
     wire [`stream] i_vgaPipe_in;
+    wire [  4-1:0] i_vgaPipe_en;
     wire [`stream] o_vgaPipe_out;
 
     vgaModulesPipe vgaPipe (
       //---- input ports ----
       .px_clk(i_vgaPipe_px_clk),
       .in    (i_vgaPipe_in    ),
+      .en    (i_vgaPipe_en    ),
       //---- output ports ----
       .out   (o_vgaPipe_out   )
     );
     // Connect Inputs:
     assign i_vgaPipe_px_clk = px_clk ;
     assign i_vgaPipe_in     = vga_str0 ;
+    assign i_vgaPipe_en     = {o_OUTBOX_o_full, ~o_OUTBOX_o_empty_n, INBOX_full, ~INBOX_empty_n };
     // ---------------------------------------- //
 
 

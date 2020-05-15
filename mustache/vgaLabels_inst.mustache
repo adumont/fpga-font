@@ -4,18 +4,19 @@
 
     wire           i_{{name}}_px_clk;
     wire [`stream] i_{{name}}_in;
-    wire           i_{{name}}_en;
+    wire [{{extw}}-1:0] i_{{name}}_en;
     wire [`stream] o_{{name}}_out;
 
     vgaLabels {{name}} (
       //---- input ports ----
       .px_clk(i_{{name}}_px_clk),
       .in    (i_{{name}}_in    ),
+      .en    (i_{{name}}_en    ),
       //---- output ports ----
       .out   (o_{{name}}_out   )
     );
     // Connect Inputs:
     assign i_{{name}}_px_clk = {{clk}};
     assign i_{{name}}_in     = {{in}};
-    assign i_{{name}}_en     = {{en}};
+    assign i_{{name}}_en     = en;
     // ---------------------------------------- //

@@ -8,7 +8,7 @@ module vgaLabels (
     // input
     input wire            px_clk,
     input wire  [`stream] in, // input stream
-    // input wire            en, // enabled
+    input wire  [{{extw}}-1:0] en, // external signals to enable/disable labels
     // output
     output reg  [`stream] out // output stream
   );
@@ -56,10 +56,10 @@ module vgaLabels (
     col = 0;
     
 {{#labels}}
-    // Label : {{label}}
-    if ( is_active({{col}}, {{line}}, {{width}}, {{zoom}}) ) 
+    // Label: {{label}}
+    if ( {{{en}}} && is_active({{col}}, {{line}}, {{width}}, {{zoom}}) )
     begin
-      active=1'b 1;
+      active={{{en}}};
       cs = `cs_w'd {{cs}};
       fg = {{fg}};
       bg = {{bg}};

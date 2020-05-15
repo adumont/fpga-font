@@ -50,6 +50,7 @@ with smart_open("../Labels.lst", "w") as fh:
     if 'col'    not in l: l['col'   ] = 0
     if 'line'   not in l: l['line'  ] = 0
     if 'offset' not in l: l['offset'] = 0
+    if 'en'     not in l: l['en'    ] = "1'b1"
 
     if s in labels_addr:
       l["offset"] = labels_addr.get(s)
@@ -77,11 +78,14 @@ for m in data["modules"]:
     m['name']=m['type'] + str(indexByType[m['type']])
     indexByType[m['type']]=indexByType[m['type']]+1
 
+  if m['type'] == "vgaLabels":
+    m['extw' ] = data['extw']
+
   # Other default values if not provided
   if 'clk'  not in m: m['clk' ] = 'px_clk'
   if 'zoom' not in m: m['zoom'] = 0
   if 'fg'   not in m: m['fg'  ] = "`WHITE"
-  if 'en'   not in m: m['en'  ] = 1
+  if 'en'   not in m: m['en'  ] = "1'b1"
   if 'col'  not in m: m['col' ] = 0
   if 'line' not in m: m['line'] = 0
   if 'offset' not in m: m['offset'] = 0
