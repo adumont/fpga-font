@@ -2,26 +2,76 @@
 labels:
 - label: HRM
   zoom: 2
-  fg: "`YELLOW"
+  fg: "`BLACK"
+  bg: "`YELLOW"
 
 - label: CPU
   line: 1
   zoom: 2
-  bg: "`RED"
+  fg: "`BLACK"
+  bg: "`YELLOW"
 
-- label: by @adumont
+- label: Verilog CPU
   line: 8
-  fg: "`YELLOW"
+  fg: "`GREEN"
 
-- label: Inbox
+- label: by @Adumont
+  line: 9
+  fg: "`GREEN"
+
+- label: "(c)2020"
+  line: 10
+  fg: "`GREEN"
+
+- label: INBOX
   line: 0
-  col: 12
+  col: 13
+  fg: "`GREEN"
+
+- label: OUTBOX
+  line: 5
+  col: 13
+  fg: "`GREEN"
+
+- label: "A:"
+  line: 1
+  col: 16
   fg: "`YELLOW"
 
-- label: Outbox
-  line: 5
-  col: 12
+- label: "A:"
+  line: 3
+  col: 16
   fg: "`YELLOW"
+
+- label: "A:"
+  line: 6
+  col: 16
+  fg: "`YELLOW"
+
+- label: "A:"
+  line: 8
+  col: 16
+  fg: "`YELLOW"
+
+- label: "D:"
+  line: 2
+  col: 16
+  fg: "`WHITE"
+
+- label: "D:"
+  line: 4
+  col: 16
+  fg: "`WHITE"
+
+- label: "D:"
+  line: 7
+  col: 16
+  fg: "`WHITE"
+
+- label: "D:"
+  line: 9
+  col: 16
+  fg: "`WHITE"
 
 modules:
 - name: vgaLabels0
@@ -33,11 +83,3 @@ modules:
   col: 16
   width: 64
   cs: 1
-
-- name: vgaInbox1
-  type: vgaWord
-  line: 3
-  col: 16
-  width: 64
-  cs: 1
-  offset: 16
