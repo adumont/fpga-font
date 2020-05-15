@@ -143,7 +143,7 @@ $(BUILDDIR)/$(MODULE)-netlist.json: $(MODULE).v $(DEPS) | $(BUILDDIR)
 
 $(BUILDDIR)/$(MODULE)-netlist-svg.json: $(MODULE).v $(DEPS) | $(BUILDDIR)
 
-	yosys -DYOSYS_PLOT -p "prep -top $(MODULE); write_json -compat-int $(BUILDDIR)/$(MODULE)-netlist.json" $(MODULE).v
+	yosys -DYOSYS_PLOT -q -p "prep -top $(MODULE); write_json -compat-int $(BUILDDIR)/$(MODULE)-netlist.json" $(MODULE).v
 
 assets/$(MODULE).svg: $(BUILDDIR)/$(MODULE)-netlist-svg.json $(DEPS)
 
