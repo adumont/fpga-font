@@ -25,7 +25,7 @@ else ifeq ($(MODULE), font)
 
 endif
 
-YOSYSOPT:=-retime -abc2
+#YOSYSOPT:=-retime -abc2
 
 ifndef MEMORY
 	MEMORY="1k"
