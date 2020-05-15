@@ -17,7 +17,7 @@ labels:
 
 - label: by @Adumont
   line: 9
-  fg: "`GREEN"ad
+  fg: "`GREEN"
 
 - label: "(c)2020"
   line: 10
