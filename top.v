@@ -35,6 +35,11 @@ module top (
     wire sw1_u; // pulse when sw released
     wire sw1_s; // sw state
     debouncer db_sw1 (.clk(clk), .PB(sw1), .PB_down(sw1_d), .PB_up(sw1_u), .PB_state(sw1_s));
+
+    wire sw2_d; // pulse when sw pressed
+    wire sw2_u; // pulse when sw released
+    wire sw2_s; // sw state
+    debouncer db_sw2 (.clk(clk), .PB(sw2), .PB_down(sw2_d), .PB_up(sw2_u), .PB_state(sw2_s));
     //`endif
 
     `include "functions.vh"
@@ -115,6 +120,28 @@ module top (
     // ---------------------------------------- //
 
     // ---------------------------------------- //
+    // passThrough (register)
+    // Fake Ram (output address)
+
+    wire         i_passThrough_clk;
+    wire [`addr_w-1:0] i_passThrough_in;
+    wire [`addr_w-1:0] o_passThrough_out;
+
+    register passThrough (
+      //---- input ports ----
+      .clk(i_passThrough_clk),
+      .in (i_passThrough_in ),
+      //---- output ports ----
+      .out(o_passThrough_out)
+    );
+    // Define Parameters:
+    defparam passThrough.w = `addr_w;
+    // Connect Inputs:
+    assign i_passThrough_clk = px_clk ;
+    assign i_passThrough_in  = o_vgaPipe_out[`addr]; // ADDR ;
+    // ---------------------------------------- //
+
+    // ---------------------------------------- //
     // reg0 (register)
     //
 
@@ -153,6 +180,8 @@ module top (
       case( o_reg0_out[`cs] )
         `cs_w'd 0: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, o_labelsRam_dout } ; // Label RAM, cs = 0
         `cs_w'd 1: { o_ramMux_valid, o_ramMux_dout } = { INBOX_o_dmp_valid, INBOX_o_dmp_data }; // INBOX, cs = 1
+        // `cs_w'd 2: { o_ramMux_valid, o_ramMux_dout } = { o_OUTBOX_o_dmp_valid, o_OUTBOX_o_dmp_data }; // OUTBOX, cs = 2
+        `cs_w'd 3: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, o_passThrough_out } ; // Passthrough, cs = 3
         default: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, 8'h00 };
       endcase
     end
