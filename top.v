@@ -180,7 +180,7 @@ module top (
       case( o_reg0_out[`cs] )
         `cs_w'd 0: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, o_labelsRam_dout } ; // Label RAM, cs = 0
         `cs_w'd 1: { o_ramMux_valid, o_ramMux_dout } = { INBOX_o_dmp_valid, INBOX_o_dmp_data }; // INBOX, cs = 1
-        // `cs_w'd 2: { o_ramMux_valid, o_ramMux_dout } = { o_OUTBOX_o_dmp_valid, o_OUTBOX_o_dmp_data }; // OUTBOX, cs = 2
+        `cs_w'd 2: { o_ramMux_valid, o_ramMux_dout } = { o_OUTBOX_o_dmp_valid, o_OUTBOX_o_dmp_data }; // OUTBOX, cs = 2
         `cs_w'd 3: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, o_passThrough_out } ; // Passthrough, cs = 3
         default: { o_ramMux_valid, o_ramMux_dout } = { 1'b 1, 8'h00 };
       endcase
@@ -407,7 +407,61 @@ module top (
     // ---------------------------------------- //
 
     // wire pop_inbox = sw1_d;
-    wire pop_inbox = ~o_tx_o_busy & sw1_d & INBOX_empty_n;
+    wire pop_inbox = sw1_d & INBOX_empty_n & ~o_OUTBOX_o_full;
+
+    // ---------------------------------------- //
+    // OUTBOX (ufifo)
+    //
+
+    wire        i_OUTBOX_i_clk;
+    wire        i_OUTBOX_i_rst;
+    wire        i_OUTBOX_i_wr;
+    wire  [7:0] i_OUTBOX_i_data;
+    wire        o_OUTBOX_o_empty_n;
+    wire        o_OUTBOX_o_full;
+    wire        i_OUTBOX_i_rd;
+    wire  [7:0] o_OUTBOX_o_data;
+    wire [15:0] o_OUTBOX_o_status;
+    wire        o_OUTBOX_o_err;
+    wire        i_OUTBOX_i_dmp_clk;
+    wire  [4:0] i_OUTBOX_i_dmp_pos;
+    wire  [7:0] o_OUTBOX_o_dmp_data;
+    wire        o_OUTBOX_o_dmp_valid;
+
+    ufifo OUTBOX (
+      //---- input ports ----
+      .i_clk      (i_OUTBOX_i_clk      ),
+      .i_rst      (i_OUTBOX_i_rst      ),
+      .i_wr       (i_OUTBOX_i_wr       ),
+      .i_data     (i_OUTBOX_i_data     ),
+      .i_rd       (i_OUTBOX_i_rd       ),
+      .i_dmp_clk  (i_OUTBOX_i_dmp_clk  ),
+      .i_dmp_pos  (i_OUTBOX_i_dmp_pos  ),
+      //---- output ports ----
+      .o_empty_n  (o_OUTBOX_o_empty_n  ),
+      .o_full     (o_OUTBOX_o_full     ),
+      .o_data     (o_OUTBOX_o_data     ),
+      .o_status   (o_OUTBOX_o_status   ),
+      .o_err      (o_OUTBOX_o_err      ),
+      .o_dmp_data (o_OUTBOX_o_dmp_data ),
+      .o_dmp_valid(o_OUTBOX_o_dmp_valid)
+    );
+    // Define Parameters:
+    // defparam OUTBOX.BW = ;
+    defparam OUTBOX.LGFLEN = 4'd5;
+    defparam OUTBOX.RXFIFO = 1'b1;
+    // Connect Inputs:
+    assign i_OUTBOX_i_clk       = clk ;
+    assign i_OUTBOX_i_rst       = 0 ;
+    assign i_OUTBOX_i_wr        = pop_inbox;
+    assign i_OUTBOX_i_data      = INBOX_o_data ;
+    assign i_OUTBOX_i_rd        = pop_outbox ;
+    assign i_OUTBOX_i_dmp_clk   = px_clk ;
+    assign i_OUTBOX_i_dmp_pos   = o_vgaPipe_out[`addr_s +: 4'd5];
+    // ---------------------------------------- //
+ 
+    // wire pop_inbox = sw1_d;
+    wire pop_outbox = ~o_tx_o_busy & sw2_d & o_OUTBOX_o_empty_n;
 
     // ---------------------------------------- //
     // tx (txuartlite)
@@ -432,8 +486,8 @@ module top (
     defparam tx.CLOCKS_PER_BAUD = baudsDivider;
     // Connect Inputs:
     assign i_tx_i_clk     = clk ;
-    assign i_tx_i_wr      = pop_inbox ;
-    assign i_tx_i_data    = INBOX_o_data ;
+    assign i_tx_i_wr      = pop_outbox ;
+    assign i_tx_i_data    = o_OUTBOX_o_data ;
     // ---------------------------------------- //
 
     assign TX=o_tx_o_uart_tx; // UART Loopback

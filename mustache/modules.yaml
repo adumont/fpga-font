@@ -77,9 +77,16 @@ modules:
 - name: vgaLabels0
   type: vgaLabels
 
-- name: vgaInbox0
+- name: vgaINBOX
   type: vgaWord
   line: 1
   col: 16
   width: 64
   cs: 1
+
+- name: vgaOUTBOX
+  type: vgaWord
+  line: 6
+  col: 16
+  width: 64
+  cs: 2
