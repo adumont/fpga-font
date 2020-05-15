@@ -10,6 +10,7 @@
 `include "register.v"
 `include "hex2asc.v"
 `include "rxuartlite.v"
+`include "txuartlite.v"
 `include "font.v"
 `include "ufifo.v"
 // check connections to VGA adapter on https://github.com/Obijuan/MonsterLED/wiki
@@ -370,13 +371,43 @@ module top (
     // Connect inputs
     assign INBOX_i_data = rx_o_data;
     assign INBOX_i_wr = rx_o_wr;
-    assign INBOX_i_rd = sw1_d;
+    assign INBOX_i_rd = pop_inbox;
     assign INBOX_i_rst = 0;
     assign INBOX_i_dmp_clk = px_clk;
     assign INBOX_i_dmp_pos = o_vgaPipe_out[`addr_s +: 4'd5];
     // ---------------------------------------- //
 
-    assign TX=RX; // UART Loopback
+    // wire pop_inbox = sw1_d;
+    wire pop_inbox = ~o_tx_o_busy & sw1_d & INBOX_empty_n;
+
+    // ---------------------------------------- //
+    // tx (txuartlite)
+    //
+
+    wire       i_tx_i_clk;
+    wire       i_tx_i_wr;
+    wire [7:0] i_tx_i_data;
+    wire       o_tx_o_uart_tx;
+    wire       o_tx_o_busy;
+
+    txuartlite tx (
+      //---- input ports ----
+      .i_clk    (i_tx_i_clk    ),
+      .i_wr     (i_tx_i_wr     ),
+      .i_data   (i_tx_i_data   ),
+      //---- output ports ----
+      .o_uart_tx(o_tx_o_uart_tx),
+      .o_busy   (o_tx_o_busy   )
+    );
+    // Define Parameters:
+    defparam tx.CLOCKS_PER_BAUD = baudsDivider;
+    // Connect Inputs:
+    assign i_tx_i_clk     = clk ;
+    assign i_tx_i_wr      = pop_inbox ;
+    assign i_tx_i_data    = INBOX_o_data ;
+    // ---------------------------------------- //
+
+    assign TX=o_tx_o_uart_tx; // UART Loopback
 
 endmodule
 
