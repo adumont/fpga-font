@@ -10,7 +10,6 @@ include Design.mk
 -include $(MODULE).v.d
 
 %.v.d: %.v $(DEPS) $(MUSTACHE_GENERATED)
-	$(warning Building $@)
 	$(YOSYS) -q -E $@.tmp $<
 	sed 's/:/DEPS:=/g' < $@.tmp > $@
 	rm $@.tmp
@@ -61,6 +60,7 @@ dot: assets/$(MODULE)_dot.svg
 lint: $(BOARD_BUILDDIR)/$(MODULE).lint
 pipe: Labels.lst vgaModulesPipe.v
 deps: $(MODULE).v.d
+mustache: $(MUSTACHE_GENERATED)
 
 # @echo '@: $@' # file name of the target
 # @echo '%: $%' # name of the archive member
@@ -155,7 +155,7 @@ assets/$(MODULE)_dot.svg: $(MODULE).v $(DEPS)
 	mv $(MODULE)_dot.svg assets/
 	[ -f $(MODULE)_dot.dot ] && rm $(MODULE)_dot.dot
 
-$(MUSTACHE_GENERATED): $(wildcard mustache/*.mustache)
+$(MUSTACHE_GENERATED): $(wildcard mustache/*.mustache) mustache/modules.yaml
 	cd mustache && ./mkPipe.py
 
 # We save AUXFILES names to build.config. Force a rebuild if they have changed

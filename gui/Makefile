@@ -15,15 +15,15 @@ RTL_PIPE := $(addprefix $(RTL_DIR)/, $(MUSTACHE_GENERATED))
 VLIBS := verilated.o verilated_save.o verilated_vcd_c.o
 VOBJS := $(addprefix $(RTL_DIR)/obj_dir/, $(VLIBS) V$(RTL_TOP)__ALLcls.o V$(RTL_TOP)__ALLsup.o )
 
-$(RTL_PIPE): $(wildcard $(RTL_DIR)/mustache/*.mustache)
-	make -C .. Labels.lst vgaModulesPipe.v vgaLabels.v
+$(RTL_PIPE): $(wildcard $(RTL_DIR)/mustache/*.mustache) $(RTL_DIR)/mustache/modules.yaml
+	make -C .. mustache
 
 verilator: $(VOBJS) $(RTL_DEPS)
 
 $(PROJECT): $(PROJECT).mk $(VOBJS) .FORCE
 	cd $(GUI_DIR) && make -f $(PROJECT).mk
 
-$(VOBJS): $(RTL_DIR)/$(RTL_TOP).v $(RTL_DEPS)
+$(VOBJS): $(RTL_DIR)/$(RTL_TOP).v $(RTL_DEPS) $(RTL_PIPE)
 	cd $(RTL_DIR) && verilator --savable --trace --trace-max-array 256 --public -cc $(RTL_TOP).v
 	make -C $(RTL_DIR)/obj_dir/ -f V$(RTL_TOP).mk V$(RTL_TOP)__ALL.a $(VLIBS)
 
